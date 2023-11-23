@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color changing navbar</title>
+    <style>
+        :root{
+            --dark-grey: rgb(68, 68, 70);
+            --green-success: rgb(228, 172, 100);
+            --nav-color: rgb(148, 148, 235);
+        }
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .navbar{
+            background-color: var(--nav-color);
+            padding-left: 25px;
+        }
+        nav ul{
+            list-style-type: none;
+            display: flex;
+            padding: 2px;
+        }
+        nav ul li{
+            margin: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li>Home</li>
+            <li>About</li>
+            <li>Contact</li>
+        </ul>
+    </nav>
+</body>
+</html>

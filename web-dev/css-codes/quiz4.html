@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout Design</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2&display=swap');
+
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            padding: 10px 50px;
+            background-color: rgb(128, 128, 253);
+            position: sticky;
+            top: 0px;
+            z-index: 1;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        nav ul li {
+            margin: 0px 25px;
+        }
+
+        .container {
+            width: 95%;
+            background-color: orange;
+            margin: 45px auto;
+            padding: 40px 40px;
+            display: flow-root;
+        }
+
+        .box {
+            width: 40%;
+            height: 700px;
+            background-color: red;
+            position: relative;
+        }
+
+        .box:first-child {
+            float: left;
+            left: 100px;
+            background-color: aquamarine;
+        }
+
+        .box:nth-child(2) {
+            float: right;
+            right: 100px;
+            background-color: lightskyblue;
+        }
+
+        .hoard {
+            width: 85%;
+            height: 120px;
+            margin: 20px auto;
+            text-align: center;
+            background-color: black;
+            color: white;
+            font-family: 'Baloo 2', sans-serif;
+            border: 2px solid blue;
+            border-radius: 32px;
+            font-size: 47px;
+            line-height: 120px;
+        }
+
+        .sticker {
+            position: fixed;
+            background-color: green;
+            height: 40px;
+            width: 40px;
+            border: 2px solid blue;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            right: 10px;
+            bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <ul>
+            <li>Home</li>
+            <li>About</li>
+            <li>Contact</li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="box">This is box 1.</div>
+        <div class="box">This is box 2.</div>
+    </div>
+
+    <div class="hoard">
+        Welcome to Sigma Web Development Express
+    </div>
+
+    <div class="sticker">
+        AC
+    </div>
+</body>
+
+</html>
