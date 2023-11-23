@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UltraEdit Clone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI';
+        }
+
+        .nav-left-box img {
+            width: 180.88px;
+            height: auto;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 96px;
+        }
+
+        .nav-left-box {
+            display: flex;
+        }
+
+        .nav-right-box {
+            display: flex;
+        }
+
+        .nav-right-box ul {
+            display: flex;
+            list-style-type: none;
+            column-gap: 50px;
+            font-size: 17px;
+        }
+
+        .nav-right-box ul li a {
+            text-decoration: none;
+            color: black;
+        }
+
+        .nav-right-box ul li a::after {
+            content: "";
+            display: inline-block;
+            background-image: url('./images/nav-drop.png');
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 10px;
+            width: 10px;
+            margin-left: 6px;
+        }
+
+        .lang-img {
+            margin-left: 25px;
+        }
+
+        .lang-img:hover {
+            cursor: pointer;
+        }
+
+        .primary-download {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 90px;
+        }
+
+        .section-title {
+            font-size: 48px;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        .review-img {
+            margin-left: 10px;
+        }
+
+        .review-img:hover {
+            cursor: pointer;
+        }
+
+        .primary-download p {
+            font-size: 24px;
+            text-align: center;
+            margin: 40px 0px;
+            width: 1000px;
+        }
+
+        main {
+            padding: 50px;
+        }
+
+        .btn {
+            display: flex;
+            text-decoration: none;
+            padding: 15px 18px;
+            font-weight: bold;
+            font-size: 14px;
+            border-radius: 5px;
+            width: fit-content;
+            color: white;
+        }
+
+        .btn-blue {
+            background-color: #00b6d1;
+        }
+
+        .btn-blue:hover {
+            background-color: #09a6bd;
+        }
+
+        .lang-header-container {
+            grid-column: 2/-2;
+            grid-row: 1/2;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            column-gap: 25px;
+            padding-left: 20px;
+        }
+
+        .lang-header {
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .version-details a {
+            text-decoration: none;
+            color: black;
+        }
+
+        .version-details {
+            margin-left: -20px;
+            padding-top: 5px;
+        }
+
+        .other-langs {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .lang-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: 500;
+            font-size: 25px;
+            background-color: #f9f9f9;
+            width: fit-content;
+            padding: 23px 20px;
+            margin: 20px;
+            row-gap: 30px;
+            border-radius: 5px;
+        }
+
+        .lang-btn-container {
+            display: flex;
+            column-gap: 10px;
+        }
+
+        .lang-box-head {
+            font-size: 21px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lang-box-head span {
+            font-size: 12px;
+            text-align: center;
+            margin-top: 13px;
+            font-weight: 400;
+        }
+
+        .lang-box-btn {
+            font-size: 12px;
+            padding: 12px 16px;
+        }
+
+        .lang-box-container {
+            grid-column: 2/-2;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            margin: 20px 0px;
+        }
+
+        .btn-success {
+            background-color: #5cb85c;
+        }
+
+        .btn-success:hover {
+            background-color: #81c780;
+        }
+
+        #eng-box span{
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="nav-left-box">
+                <img src="./images/nav-logo.png" alt="logo">
+            </div>
+            <div class="nav-right-box">
+                <ul>
+                    <li><a href="#">Products</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Resources</a></li>
+                    <li><a href="#">About us</a></li>
+                </ul>
+                <img src="./images/nav-lang.png" alt="lang" class="lang-img">
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="primary-download">
+            <h1 class="section-title">Download <strong>UltraEdit</strong> for Windows
+                <img src="./images/section-review.png" alt="review" class="review-img">
+            </h1>
+
+            <p>Download and try UltraEdit before you buy it! This download includes the full Windows version of the text
+                editor.</p>
+            <a href="./downloads/setup.exe" class="btn btn-blue">DOWNLOAD MAC OR LINUX VERSION</a>
+        </section>
+        <section class="other-langs">
+            <div class="lang-header-container">
+                <img src="./images/section-ue-logo.png" alt="logo">
+                <h3 class="lang-header">Download UltraEdit</h3>
+                <span class="version-details">
+                    v2023.1(released 08/16/2023) | <a href="#">Hotfix</a>
+                </span>
+            </div>
+
+            <div class="lang-box-container">
+
+                <div class="lang-box" id="eng-box">
+                    <div class="lang-box-head">
+                        <b>
+                            English
+                        </b>
+                        <span>English</span>
+                    </div>
+                    <div class="lang-btn-container">
+                        <a href="./downloads/setup.exe" class="btn btn-blue lang-box-btn">Download 32-bit</a>
+                        <a href="./downloads/setup.exe" class="btn btn-success lang-box-btn">Download 64-bit</a>
+                    </div>
+                </div>
+
+                <div class="lang-box">
+                    <div class="lang-box-head">
+                        <b>
+                            Deutsch
+                        </b>
+                        <span>German</span>
+                    </div>
+                    <div class="lang-btn-container">
+                        <a href="./downloads/setup.exe" class="btn btn-blue lang-box-btn">Download 32-bit</a>
+                        <a href="./downloads/setup.exe" class="btn btn-success lang-box-btn">Download 64-bit</a>
+                    </div>
+                </div>
+                <div class="lang-box">
+                    <div class="lang-box-head">
+                        <b>
+                            Italiano
+                        </b>
+                        <span>Italian</span>
+                    </div>
+                    <div class="lang-btn-container">
+                        <a href="./downloads/setup.exe" class="btn btn-blue lang-box-btn">Download 32-bit</a>
+                        <a href="./downloads/setup.exe" class="btn btn-success lang-box-btn">Download 64-bit</a>
+                    </div>
+                </div>
+
+                <div class="lang-box">
+                    <div class="lang-box-head">
+                        <b>
+                            Español
+                        </b>
+                        <span>Spanish</span>
+                    </div>
+                    <div class="lang-btn-container">
+                        <a href="./downloads/setup.exe" class="btn btn-blue lang-box-btn">Download 32-bit</a>
+                        <a href="./downloads/setup.exe" class="btn btn-success lang-box-btn">Download 64-bit</a>
+                    </div>
+                </div>
+
+                <div class="lang-box">
+                    <div class="lang-box-head">
+                        <b>
+                            français
+                        </b>
+                        <span>French</span>
+                    </div>
+                    <div class="lang-btn-container">
+                        <a href="./downloads/setup.exe" class="btn btn-blue lang-box-btn">Download 32-bit</a>
+                        <a href="./downloads/setup.exe" class="btn btn-success lang-box-btn">Download 64-bit</a>
+                    </div>
+                </div>
+                <div class="lang-box">
+                    <div class="lang-box-head">
+                        <b>
+                            Português brasileiro
+                        </b>
+                        <span>Brazilian Portuguese</span>
+                    </div>
+                    <div class="lang-btn-container">
+                        <a href="./downloads/setup.exe" class="btn btn-blue lang-box-btn">Download 32-bit</a>
+                        <a href="./downloads/setup.exe" class="btn btn-success lang-box-btn">Download 64-bit</a>
+                    </div>
+                </div>
+
+                <div class="lang-box">
+                    <div class="lang-box-head">
+                        <b>
+                            日本
+                        </b>
+                        <span>Japanese</span>
+                    </div>
+                    <div class="lang-btn-container">
+                        <a href="./downloads/setup.exe" class="btn btn-blue lang-box-btn">Download 32-bit</a>
+                        <a href="./downloads/setup.exe" class="btn btn-success lang-box-btn">Download 64-bit</a>
+                    </div>
+                </div>
+
+                <div class="lang-box">
+                    <div class="lang-box-head">
+                        <b>
+                            한국어
+                        </b>
+                        <span>Korean</span>
+                    </div>
+                    <div class="lang-btn-container">
+                        <a href="./downloads/setup.exe" class="btn btn-blue lang-box-btn">Download 32-bit</a>
+                        <a href="./downloads/setup.exe" class="btn btn-success lang-box-btn">Download 64-bit</a>
+                    </div>
+                </div>
+                <div class="lang-box">
+                    <div class="lang-box-head">
+                        <b>
+                            中国
+                        </b>
+                        <span>Chinese</span>
+                    </div>
+                    <div class="lang-btn-container">
+                        <a href="./downloads/setup.exe" class="btn btn-blue lang-box-btn">Download 32-bit</a>
+                        <a href="./downloads/setup.exe" class="btn btn-success lang-box-btn">Download 64-bit</a>
+                    </div>
+                </div>
+                <div class="lang-box">
+                    <div class="lang-box-head">
+                        <b>
+                            中國
+                        </b>
+                        <span>Chinese</span>
+                    </div>
+                    <div class="lang-btn-container">
+                        <a href="./downloads/setup.exe" class="btn btn-blue lang-box-btn">Download 32-bit</a>
+                        <a href="./downloads/setup.exe" class="btn btn-success lang-box-btn">Download 64-bit</a>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </section>
+    </main>
+</body>
+
+</html>

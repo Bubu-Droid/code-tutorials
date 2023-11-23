@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Viewer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .card {
+            border: 2px solid grey;
+            width: 250px;
+            margin: 10px auto;
+            padding: 6px;
+            border-radius: 15px;
+        }
+
+        .card-tag {
+            padding: 2px;
+        }
+
+        .card-img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 15px;
+        }
+
+        .card-tag {
+            display: inline-block;
+            border: 2px solid #8888f1;
+            padding: 6px;
+            border-radius: 20px;
+            width: 56px;
+            text-align: center;
+            margin-bottom: 22px;
+            margin-left: 5px;
+        }
+
+        .card-head {
+            margin-left: 10px;
+            font-size: 34px;
+            font-family: 'Ubuntu', sans-serif;
+        }
+
+        .card-body {
+            margin-left: 10px;
+            margin-top: 16px;
+            font-family: 'Baloo 2', sans-serif;
+        }
+
+        .card-blue-button {
+            display: block;
+            text-align: center;
+            padding: 16px;
+            width: fit-content;
+            margin: 15px auto;
+            border-radius: 33px;
+            text-decoration: none;
+            background: #d1d1ff;
+            font-size: 16px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1698709175575-1c274d093a53?auto=format&fit=crop&q=80&w=2071&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Image not found" height="200" class="card-img">
+        <div class="tag-holder">
+            <span class="card-tag">Nature</span>
+            <span class="card-tag">Lake</span>
+        </div>
+        <div class="card-head">Card heading</div>
+        <div class="card-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio necessitatibus ab
+            consectetur assumenda? In, sint. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sit vero, fugiat
+            asperiores veritatis quia dicta.</div>
+        <a href="#" class="card-blue-button">Read more</a>
+    </div>
+</body>
+
+</html>

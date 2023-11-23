@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bouncing ball</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container{
+            width: 80vw;
+            height: 80vh;
+            margin: auto;
+            border: 2px solid peru;
+            margin-top: 40px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-start;
+            position: relative;
+        }
+
+        .ball{
+            height: 100px;
+            width: 100px;
+            border-radius: 50%;
+            background-color: rebeccapurple;
+            border: 2px solid black;
+            animation: bounce_x 2s linear 1s infinite alternate, bounce_y 1s ease-out 1s infinite alternate;
+            position: absolute;
+        }
+
+        @keyframes bounce_x {
+            from{
+                left: 0px;
+            }
+            to{
+                left: 80%;
+            }
+        }
+
+        @keyframes bounce_y {
+            from{
+                bottom: 0px;
+            }
+            to{
+                bottom: 40vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="ball">
+
+        </div>
+    </div>
+</body>
+</html>
