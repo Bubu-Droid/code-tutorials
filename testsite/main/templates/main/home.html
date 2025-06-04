@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+{% block description %}Welcome to Bubu’s site &mdash; notes,
+rants, math, and more.{% endblock %}
+
+{% block content %}
+<main>
+<section>
+  <h1>Welcome.</h1>
+  <p>This is Bubu’s personal website &mdash; a curated collection of mathematical ideas, blog posts, code musings, and
+    personal thoughts.</p>
+</section>
+
+<section>
+  <h2>Explore</h2>
+  <ul>
+    <li><a href="{% url 'main:calculus_page' %}">Calculus</a></li>
+    <li><a href="{% url 'main:olympiads_page' %}">Olympiads</a></li>
+    <li><a href="{% url 'blog:post_index' %}">Blog</a></li>
+    <li><a href="{% url 'main:pet_peeves_page' %}">Pet Peeves</a></li>
+    <li><a href="{% url 'main:contact_page' %}">Contact</a></li>
+    <li><a href="{% url 'archive:post_index' %}">Archive</a></li>
+  </ul>
+</section>
+<main>
+{% endblock %}
