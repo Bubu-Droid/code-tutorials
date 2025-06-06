@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'main/style.css' %}">
+{% endblock %}
+
 {% block title %}Contact{% endblock %}
 {% block description %}Ways to reach out &mdash; for feedback,
 collaboration, or just to say hi.{% endblock %}
@@ -14,5 +19,5 @@ collaboration, or just to say hi.{% endblock %}
     contact links.
   </p>
 </section>
-<main>
+</main>
 {% endblock %}

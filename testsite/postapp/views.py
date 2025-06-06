@@ -1,6 +1,6 @@
 import calendar
 
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render
 
 from .models import Post, PostTag
@@ -8,37 +8,39 @@ from .models import Post, PostTag
 
 def get_sidebar_data(is_archive):
     posts = Post.objects.filter(is_archive=is_archive)
-    archive_data = {}
+    post_timeline = {}
     for post in posts:
         year = str(post.date.year)
         month = str(calendar.month_name[post.date.month])
-        if year not in archive_data:
-            archive_data[year] = {}
-        if month not in archive_data[year]:
-            archive_data[year][month] = []
-        archive_data[year][month].append(post)
-    tags = (
-        PostTag.objects.annotate(num_posts=Count("posts"))
+        if year not in post_timeline:
+            post_timeline[year] = {}
+        if month not in post_timeline[year]:
+            post_timeline[year][month] = []
+        post_timeline[year][month].append(post)
+    post_timeline = dict(reversed(list(post_timeline.items())))
+    tag_list = (
+        PostTag.objects.filter(posts__is_archive=is_archive)
+        .annotate(num_posts=Count("posts", filter=Q(posts__is_archive=is_archive)))
         .filter(num_posts__gt=0)
         .order_by("-num_posts")
     )
     suggested_posts = Post.objects.filter(
         is_archive=is_archive, suggested=True
     ).order_by("-date")
-    return archive_data, tags, suggested_posts
+    return post_timeline, tag_list, suggested_posts
 
 
 def post_index(request):
     is_archive = request.resolver_match.namespace == "archive"
     posts = Post.objects.filter(is_archive=is_archive).order_by("-date")
-    archive_data, tags, suggested_posts = get_sidebar_data(is_archive)
+    post_timeline, tag_list, suggested_posts = get_sidebar_data(is_archive)
     return render(
         request,
         "postapp/index.html",
         {
             "post_list": posts,
-            "archive_data": archive_data,
-            "tags": tags,
+            "post_timeline": post_timeline,
+            "tag_list": tag_list,
             "suggested_posts": suggested_posts,
         },
     )
@@ -56,15 +58,15 @@ def post_tag(request, tag):
     post_list = Post.objects.filter(tags=tag_obj, is_archive=is_archive).order_by(
         "-date"
     )
-    archive_data, tags, suggested_posts = get_sidebar_data(is_archive)
+    post_timeline, tag_list, suggested_posts = get_sidebar_data(is_archive)
     return render(
         request,
         "postapp/index.html",
         {
             "post_list": post_list,
             "tag_filter": tag_obj,
-            "archive_data": archive_data,
-            "tags": tags,
+            "post_timeline": post_timeline,
+            "tag_list": tag_list,
             "suggested_posts": suggested_posts,
         },
     )

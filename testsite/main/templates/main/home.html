@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'main/style.css' %}">
+{% endblock %}
+
 {% block title %}Home{% endblock %}
 {% block description %}Welcome to Bubu’s site &mdash; notes,
 rants, math, and more.{% endblock %}
@@ -23,5 +28,5 @@ rants, math, and more.{% endblock %}
     <li><a href="{% url 'archive:post_index' %}">Archive</a></li>
   </ul>
 </section>
-<main>
+</main>
 {% endblock %}

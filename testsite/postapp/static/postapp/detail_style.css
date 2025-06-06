@@ -1,0 +1,21 @@
+main {
+  grid-column: 1/4;
+  grid-row: 2/3;
+  width: 69%;
+}
+
+article {
+  width: 75%;
+  height: fit-content;
+  padding: 3rem 5rem;
+}
+
+article:hover {
+  background-color: var(--bg-alt);
+  transform: unset;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.detail-post-content {
+  margin: 2rem 0;
+}
