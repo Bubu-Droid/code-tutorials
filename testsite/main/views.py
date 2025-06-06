@@ -19,6 +19,3 @@ def pet_peeves_page(request):
 
 def contact_page(request):
     return render(request, "main/contact.html")
-
-
-# Create your views here.

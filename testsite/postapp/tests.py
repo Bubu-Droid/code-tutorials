@@ -1,340 +1,409 @@
+import calendar
+
 from django.test import TestCase
 from django.urls import reverse
 
 from .models import Post, PostTag
 
 
-def create_post(title, slug, tags=None, is_archive=False):
-    """Utility function to create a Post object with optional tags and archive flag."""
-    post = Post.objects.create(title=title, slug=slug, is_archive=is_archive)
+def create_post(title, slug, tags=None, is_archive=False, suggested=False):
+    """Utility function to create a Post object with
+    optional tags and archive flag."""
+    post = Post.objects.create(
+        title=title, slug=slug, is_archive=is_archive, suggested=suggested
+    )
     if tags:
         post.tags.set(tags)
     return post
 
 
-class PostViewTests(TestCase):
-    def setUp(self):
-        """Create reusable tags for tests."""
-        self.tag_math = PostTag.objects.create(name="math")
-        self.tag_cs = PostTag.objects.create(name="cs")
+def create_tag(name):
+    tag = PostTag.objects.create(name=name)
+    return tag
 
-    def run_index_tests(self, namespace, is_archive):
-        """Test the index view shows correct posts based on archive flag and namespace."""
-        response = self.client.get(reverse(f"{namespace}:post_index"))
+
+class BlogIndexViewTests(TestCase):
+    def test_blog_index_no_posts(self):
+        response = self.client.get(reverse("blog:post_index"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Blog Posts")
         self.assertContains(response, "No posts yet!")
         self.assertQuerySetEqual(response.context["post_list"], [])
 
-        post1 = create_post(
-            "Post A", "post-a", tags=[self.tag_math], is_archive=is_archive
-        )
-        post2 = create_post(
-            "Post B", "post-b", tags=[self.tag_cs], is_archive=is_archive
-        )
-
-        response = self.client.get(reverse(f"{namespace}:post_index"))
-        self.assertContains(response, "Post A")
-        self.assertContains(response, "Post B")
-        self.assertContains(response, "math")
-        self.assertContains(response, "cs")
-        self.assertIn("archive_data", response.context)
-        self.assertIn("tags", response.context)
-        self.assertGreater(len(response.context["tags"]), 0)
-
-    def run_detail_tests(self, namespace, is_archive):
-        """Test the detail view renders the post and rejects if namespace is wrong."""
-        post = create_post(
-            "Detailed Post", "detailed", tags=[self.tag_math], is_archive=is_archive
-        )
-
-        response = self.client.get(
-            reverse(f"{namespace}:post_detail", args=[post.slug])
-        )
-        self.assertContains(response, "Detailed Post")
-        self.assertEqual(response.context["post"], post)
-
-        wrong_ns = "archive" if namespace == "blog" else "blog"
-        wrong_response = self.client.get(
-            reverse(f"{wrong_ns}:post_detail", args=[post.slug])
-        )
-        self.assertEqual(wrong_response.status_code, 404)
-
-    def run_tag_filter_test(self, namespace, is_archive):
-        """Test tag filtering view includes correct posts based on tag and archive flag."""
-        tagged = create_post(
-            "Tagged Post", "tagged-post", tags=[self.tag_math], is_archive=is_archive
-        )
-        untagged = create_post(
-            "Untagged Post", "untagged", tags=[self.tag_cs], is_archive=is_archive
-        )
-
-        url = reverse(f"{namespace}:post_tag", args=[self.tag_math.name])
-        response = self.client.get(url)
-        self.assertContains(response, "Tagged Post")
-        self.assertEqual(response.context["tag_filter"], self.tag_math)
-        self.assertIn("archive_data", response.context)
-        self.assertIn("tags", response.context)
-
-    def run_tag_filter_exclusion_test(self, namespace, is_archive):
-        """Ensure posts not matching the tag are excluded from tag-filtered view."""
-
-        Post.objects.all().delete()
-
-        create_post(
-            "Should Appear", "appear", tags=[self.tag_math], is_archive=is_archive
-        )
-        create_post(
-            "Should Not Appear", "hide", tags=[self.tag_cs], is_archive=is_archive
-        )
-
-        url = reverse(f"{namespace}:post_tag", args=[self.tag_math.name])
-        response = self.client.get(url)
-        self.assertContains(response, "Should Appear")
-        self.assertNotContains(response, "Should Not Appear")
-
-    def run_slug_edge_case_test(self, namespace, is_archive):
-        """Ensure slug with hyphens and numbers works correctly."""
-        post = create_post(
-            "INMO 2022 Review", "inmo-2022-review", is_archive=is_archive
-        )
-        url = reverse(f"{namespace}:post_detail", args=["inmo-2022-review"])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "INMO 2022 Review")
-
-    def test_blog_views(self):
-        """Run index, detail, tag, exclusion, and slug tests for blog section."""
-        self.run_index_tests("blog", is_archive=False)
-        self.run_detail_tests("blog", is_archive=False)
-        self.run_tag_filter_test("blog", is_archive=False)
-        self.run_tag_filter_exclusion_test("blog", is_archive=False)
-        self.run_slug_edge_case_test("blog", is_archive=False)
-
-    def test_archive_views(self):
-        """Run index, detail, tag, exclusion, and slug tests for archive section."""
-        self.run_index_tests("archive", is_archive=True)
-        self.run_detail_tests("archive", is_archive=True)
-        self.run_tag_filter_test("archive", is_archive=True)
-        self.run_tag_filter_exclusion_test("archive", is_archive=True)
-        self.run_slug_edge_case_test("archive", is_archive=True)
-
-    def test_sidebar_tag_counts(self):
-        """Test that tag counts in sidebar match post associations."""
-        create_post("Tagged Once", "once", tags=[self.tag_math])
-        create_post("Tagged Twice", "twice", tags=[self.tag_math, self.tag_cs])
-
+    def test_post_timeline_no_posts(self):
         response = self.client.get(reverse("blog:post_index"))
-        tags = response.context["tags"]
+        self.assertNotContains(response, "Post Timeline")
+        self.assertEqual(response.context["post_timeline"], {})
 
-        math_tag = next(t for t in tags if t.name == "math")
+    def test_tag_list_no_posts(self):
+        response = self.client.get(reverse("blog:post_index"))
+        self.assertNotContains(response, "Tag List")
+        self.assertQuerySetEqual(response.context["tag_list"], [])
+
+    def test_suggested_reads_no_post(self):
+        response = self.client.get(reverse("blog:post_index"))
+        self.assertNotContains(response, "Suggested Reads")
+        self.assertQuerySetEqual(response.context["suggested_posts"], [])
+
+    def test_blog_index_multiple_posts(self):
+        post1 = create_post("Post Title 1", "post-title-1")
+        post2 = create_post("Post Title 2", "post-title-2")
+        response = self.client.get(reverse("blog:post_index"))
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerySetEqual(response.context["post_list"], [post1, post2])
+
+    def test_tags_in_post(self):
+        math_tag = create_tag("math")
+        cs_tag = create_tag("cs")
+        post = create_post("Post Title", "post-title", [math_tag])
+        response = self.client.get(reverse("blog:post_index"))
+        target_post = response.context["post_list"][0]
+        self.assertIn(math_tag, target_post.tags.all())
+        self.assertNotIn(cs_tag, target_post.tags.all())
+
+    def test_post_timeline_with_post(self):
+        post = create_post("Post Title", "post-title")
+        response = self.client.get(reverse("blog:post_index"))
+        timeline = response.context["post_timeline"]
+        flattened_title = [
+            p.title
+            for year_val in timeline.values()
+            for month_posts in year_val.values()
+            for p in month_posts
+        ]
+        flattened_year = timeline.keys()
+        flattened_month = [
+            month for year_val in timeline.values() for month in year_val.keys()
+        ]
+
+        self.assertIn(post.title, flattened_title)
+        year_const = str(post.date.year)
+        month_const = str(calendar.month_name[post.date.month])
+        self.assertIn(year_const, flattened_year)
+        self.assertIn(month_const, flattened_month)
+
+    def test_tag_list_with_post(self):
+        math_tag = create_tag("math")
+        cs_tag = create_tag("cs")
+        post = create_post("Post Title", "post-title", tags=[math_tag])
+        response = self.client.get(reverse("blog:post_index"))
+        tag_list = response.context["tag_list"]
+        self.assertIn(math_tag, tag_list)
+        self.assertNotIn(cs_tag, tag_list)
+
+    def test_suggested_reads_with_post(self):
+        post1 = create_post("Post 1", "post-1", suggested=True)
+        post2 = create_post("Post 2", "post-2", suggested=False)
+        response = self.client.get(reverse("blog:post_index"))
+        suggest_list = response.context["suggested_posts"]
+        self.assertIn(post1, suggest_list)
+        self.assertNotIn(post2, suggest_list)
+
+    def test_tag_view_sidebar_counts(self):
+        math_tag = create_tag("math")
+        cs_tag = create_tag("cs")
+        create_post("Tagged Once", "once", tags=[math_tag])
+        create_post("Tagged Twice", "twice", tags=[math_tag, cs_tag])
+        response = self.client.get(reverse("blog:post_index"))
+        tags = response.context["tag_list"]
+        math_tag = next(t for t in tags if t.name == math_tag.name)
         cs_tag = next(t for t in tags if t.name == "cs")
-
         self.assertEqual(math_tag.num_posts, 2)
         self.assertEqual(cs_tag.num_posts, 1)
 
+    def test_tag_filter_sidebar_only_shows_namespace_tags(self):
+        tag1 = create_tag("A")
+        tag2 = create_tag("B")
+        create_post("Post A", "a", tags=[tag1])
+        create_post("Post B", "b", tags=[tag2], is_archive=True)
+        response = self.client.get(reverse("blog:post_tag", args=["A"]))
+        tag_names = {tag.name for tag in response.context["tag_list"]}
+        self.assertIn("A", tag_names)
+        self.assertNotIn("B", tag_names)
 
-def test_tag_isolation_between_namespaces(self):
-    """Tags used only in blog or archive should not appear in the other sidebar."""
-    # Blog post with math tag
-    create_post("Blog Post", "blog-post", tags=[self.tag_math], is_archive=False)
-
-    # Archive post with cs tag
-    create_post("Archive Post", "archive-post", tags=[self.tag_cs], is_archive=True)
-
-    # Check blog: only math should appear
-    blog_response = self.client.get(reverse("blog:post_index"))
-    blog_tags = blog_response.context["tags"]
-    blog_tag_names = {t.name for t in blog_tags}
-    self.assertIn("math", blog_tag_names)
-    self.assertNotIn("cs", blog_tag_names)
-
-    # Check archive: only cs should appear
-    archive_response = self.client.get(reverse("archive:post_index"))
-    archive_tags = archive_response.context["tags"]
-    archive_tag_names = {t.name for t in archive_tags}
-    self.assertIn("cs", archive_tag_names)
-    self.assertNotIn("math", archive_tag_names)
+    def test_tag_name_uniqueness(self):
+        create_tag("math")
+        with self.assertRaises(Exception):
+            create_tag("math")
 
 
-def test_post_index_isolation_between_namespaces(self):
-    """Posts should appear only in their designated namespace (blog/archive)."""
-    blog_post = create_post("Blog Post", "blog-post", is_archive=False)
-    archive_post = create_post("Archive Post", "archive-post", is_archive=True)
+class BlogTagViewTests(TestCase):
+    def test_tag_view_with_multiple_posts(self):
+        math_tag = create_tag("math")
+        cs_tag = create_tag("cs")
+        post1 = create_post("Post 1", "post-1", tags=[math_tag])
+        post2 = create_post("Post 2", "post-2", tags=[math_tag, cs_tag])
+        post3 = create_post("Post 3", "post-3", tags=[cs_tag])
+        response = self.client.get(reverse("blog:post_tag", args=[math_tag]))
+        self.assertEqual(response.status_code, 200)
+        tgt_post_list = response.context["post_list"]
+        self.assertIn(post1, tgt_post_list)
+        self.assertIn(post2, tgt_post_list)
+        self.assertNotIn(post3, tgt_post_list)
 
-    blog_response = self.client.get(reverse("blog:post_index"))
-    archive_response = self.client.get(reverse("archive:post_index"))
-
-    self.assertContains(blog_response, "Blog Post")
-    self.assertNotContains(blog_response, "Archive Post")
-
-    self.assertContains(archive_response, "Archive Post")
-    self.assertNotContains(archive_response, "Blog Post")
-
-
-def test_archive_data_isolation_between_namespaces(self):
-    """archive_data should only contain posts from the correct namespace."""
-    blog_post = create_post("Blog Post", "blog-post", is_archive=False)
-    archive_post = create_post("Archive Post", "archive-post", is_archive=True)
-
-    blog_response = self.client.get(reverse("blog:post_index"))
-    archive_response = self.client.get(reverse("archive:post_index"))
-
-    blog_archive_data = blog_response.context["archive_data"]
-    archive_archive_data = archive_response.context["archive_data"]
-
-    # Flatten to list of titles for easier testing
-    blog_titles = [
-        post.title
-        for year in blog_archive_data.values()
-        for month_posts in year.values()
-        for post in month_posts
-    ]
-
-    archive_titles = [
-        post.title
-        for year in archive_archive_data.values()
-        for month_posts in year.values()
-        for post in month_posts
-    ]
-
-    self.assertIn("Blog Post", blog_titles)
-    self.assertNotIn("Archive Post", blog_titles)
-
-    self.assertIn("Archive Post", archive_titles)
-    self.assertNotIn("Blog Post", archive_titles)
+    def test_tag_view_with_wrong_tag(self):
+        response = self.client.get(reverse("blog:post_tag", args=["incorrect_tag"]))
+        self.assertEqual(response.status_code, 404)
 
 
-class SuggestedPostsTest(TestCase):
-    def setUp(self):
-        # Create blog post
-        self.blog_post = Post.objects.create(
-            title="Blog Post",
-            slug="blog-post",
-            is_archive=False,
-            suggested=True,
+class BlogDetailViewTests(TestCase):
+    def test_detail_view_check_sidebar(self):
+        cs_tag = create_tag("cs")
+        post = create_post("Post Title", "post-title", tags=[cs_tag], suggested=True)
+        response = self.client.get(reverse("blog:post_detail", args=[post.slug]))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Tag List")
+        self.assertNotContains(response, "Suggested Reads")
+        self.assertNotContains(response, "Post Timeline")
+
+    def test_detail_view_tags(self):
+        math_tag = create_tag("math")
+        cs_tag = create_tag("cs")
+        post = create_post("Post Title", "post-title", tags=[cs_tag])
+        post_new = create_post("New Post Title", "new-post-title", tags=[math_tag])
+        response = self.client.get(reverse("blog:post_detail", args=[post.slug]))
+        target_post = response.context["post"]
+        self.assertIn(cs_tag, target_post.tags.all())
+        self.assertNotIn(math_tag, target_post.tags.all())
+
+    def test_detail_no_other_posts(self):
+        math_tag = create_tag("math")
+        cs_tag = create_tag("cs")
+        post = create_post("Post Title", "post-title", tags=[cs_tag])
+        post_new = create_post("New Post Title", "new-post-title", tags=[math_tag])
+        response = self.client.get(reverse("blog:post_detail", args=[post.slug]))
+        self.assertNotContains(response, post_new.title)
+
+    def test_detail_wrong_slug(self):
+        post = create_post("Post Title", "post-title")
+        response = self.client.get(reverse("blog:post_detail", args=["incorrect-slug"]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_detail_slug_edge_case(self):
+        post = create_post("INMO 2025 Review", "inmo-2025-review")
+        response = self.client.get(reverse("blog:post_detail", args=[post.slug]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "INMO 2025 Review")
+
+    def test_slug_uniqueness(self):
+        create_post("Post A", "same-slug")
+        with self.assertRaises(Exception):
+            create_post("Post B", "same-slug")
+
+
+class NamespaceIndexViewTest(TestCase):
+    def test_index_post_in_correct_namespace(self):
+        blog_post = create_post("Blog Post", "blog-post")
+        archive_post = create_post("Archive Post", "archive-post", is_archive=True)
+        blog_response = self.client.get(reverse("blog:post_index"))
+        archive_response = self.client.get(reverse("archive:post_index"))
+        self.assertIn(blog_post, blog_response.context["post_list"])
+        self.assertIn(archive_post, archive_response.context["post_list"])
+        self.assertNotIn(blog_post, archive_response.context["post_list"])
+        self.assertNotIn(archive_post, blog_response.context["post_list"])
+
+
+class NamespaceDetailViewTest(TestCase):
+    def test_detail_post_in_correct_namespace(self):
+        blog_post = create_post("Blog Post", "blog-post")
+        archive_post = create_post("Archive Post", "archive-post", is_archive=True)
+        blog_response = self.client.get(
+            reverse("blog:post_detail", args=[blog_post.slug])
         )
-
-        # Create archive post
-        self.archive_post = Post.objects.create(
-            title="Archive Post",
-            slug="archive-post",
-            is_archive=True,
-            suggested=True,
+        archive_response = self.client.get(
+            reverse("archive:post_detail", args=[archive_post.slug])
         )
+        self.assertEqual(blog_response.context["post"], blog_post)
+        self.assertEqual(archive_response.context["post"], archive_post)
+        self.assertNotEqual(blog_response.context["post"], archive_post)
+        self.assertNotEqual(archive_response.context["post"], blog_post)
 
-        # Create non-suggested post
-        self.normal_post = Post.objects.create(
-            title="Normal Post",
-            slug="normal-post",
-            is_archive=False,
-            suggested=False,
+
+class NamespaceTagViewTest(TestCase):
+    def test_tag_post_in_correct_namespace(self):
+        math_tag = create_tag("math")
+        blog_post = create_post("Blog Post", "blog-post", tags=[math_tag])
+        archive_post = create_post(
+            "Archive Post", "archive-post", tags=[math_tag], is_archive=True
         )
+        blog_response = self.client.get(reverse("blog:post_tag", args=[math_tag]))
+        archive_response = self.client.get(reverse("archive:post_tag", args=[math_tag]))
+        self.assertIn(blog_post, blog_response.context["post_list"])
+        self.assertIn(archive_post, archive_response.context["post_list"])
+        self.assertNotIn(blog_post, archive_response.context["post_list"])
+        self.assertNotIn(archive_post, blog_response.context["post_list"])
 
-    def test_suggested_posts_on_blog_page(self):
-        response = self.client.get(reverse("blog:post_index"))
-        self.assertContains(response, "Blog Post")
-        self.assertNotContains(response, "Archive Post")
-        self.assertContains(response, "Normal Post")
 
-    def test_suggested_posts_on_archive_page(self):
+class ArchiveIndexViewTests(TestCase):
+    def test_archive_index_no_posts(self):
         response = self.client.get(reverse("archive:post_index"))
-        self.assertContains(response, "Archive Post")
-        self.assertNotContains(response, "Blog Post")
-        self.assertContains(response, "Normal Post")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Archive Posts")
+        self.assertContains(response, "No posts yet!")
+        self.assertQuerySetEqual(response.context["post_list"], [])
 
-    def test_suggested_section_only_appears_when_needed(self):
-        response = self.client.get(reverse("blog:post_index"))
-        self.assertContains(response, "Suggested Reads")
+    def test_post_timeline_no_posts(self):
+        response = self.client.get(reverse("archive:post_index"))
+        self.assertNotContains(response, "Post Timeline")
+        self.assertEqual(response.context["post_timeline"], {})
 
-        # Turn off suggestions
-        self.blog_post.suggested = False
-        self.blog_post.save()
+    def test_tag_list_no_posts(self):
+        response = self.client.get(reverse("archive:post_index"))
+        self.assertNotContains(response, "Tag List")
+        self.assertQuerySetEqual(response.context["tag_list"], [])
 
-        response = self.client.get(reverse("blog:post_index"))
+    def test_suggested_reads_no_post(self):
+        response = self.client.get(reverse("archive:post_index"))
         self.assertNotContains(response, "Suggested Reads")
+        self.assertQuerySetEqual(response.context["suggested_posts"], [])
+
+    def test_archive_index_multiple_posts(self):
+        post1 = create_post("Post Title 1", "post-title-1", is_archive=True)
+        post2 = create_post("Post Title 2", "post-title-2", is_archive=True)
+        response = self.client.get(reverse("archive:post_index"))
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerySetEqual(response.context["post_list"], [post1, post2])
+
+    def test_tags_in_post(self):
+        math_tag = create_tag("math")
+        cs_tag = create_tag("cs")
+        post = create_post("Post Title", "post-title", [math_tag], is_archive=True)
+        response = self.client.get(reverse("archive:post_index"))
+        target_post = response.context["post_list"][0]
+        self.assertIn(math_tag, target_post.tags.all())
+        self.assertNotIn(cs_tag, target_post.tags.all())
+
+    def test_post_timeline_with_post(self):
+        post = create_post("Post Title", "post-title", is_archive=True)
+        response = self.client.get(reverse("archive:post_index"))
+        timeline = response.context["post_timeline"]
+        flattened_title = [
+            p.title
+            for year_val in timeline.values()
+            for month_posts in year_val.values()
+            for p in month_posts
+        ]
+        flattened_year = timeline.keys()
+        flattened_month = [
+            month for year_val in timeline.values() for month in year_val.keys()
+        ]
+
+        self.assertIn(post.title, flattened_title)
+        year_const = str(post.date.year)
+        month_const = str(calendar.month_name[post.date.month])
+        self.assertIn(year_const, flattened_year)
+        self.assertIn(month_const, flattened_month)
+
+    def test_tag_list_with_post(self):
+        math_tag = create_tag("math")
+        cs_tag = create_tag("cs")
+        post = create_post("Post Title", "post-title", tags=[math_tag], is_archive=True)
+        response = self.client.get(reverse("archive:post_index"))
+        tag_list = response.context["tag_list"]
+        self.assertIn(math_tag, tag_list)
+        self.assertNotIn(cs_tag, tag_list)
+
+    def test_suggested_reads_with_post(self):
+        post1 = create_post("Post 1", "post-1", suggested=True, is_archive=True)
+        post2 = create_post("Post 2", "post-2", suggested=False, is_archive=True)
+        response = self.client.get(reverse("archive:post_index"))
+        suggest_list = response.context["suggested_posts"]
+        self.assertIn(post1, suggest_list)
+        self.assertNotIn(post2, suggest_list)
+
+    def test_tag_view_sidebar_counts(self):
+        math_tag = create_tag("math")
+        cs_tag = create_tag("cs")
+        create_post("Tagged Once", "once", tags=[math_tag], is_archive=True)
+        create_post("Tagged Twice", "twice", tags=[math_tag, cs_tag], is_archive=True)
+        response = self.client.get(reverse("archive:post_index"))
+        tags = response.context["tag_list"]
+        math_tag = next(t for t in tags if t.name == math_tag.name)
+        cs_tag = next(t for t in tags if t.name == "cs")
+        self.assertEqual(math_tag.num_posts, 2)
+        self.assertEqual(cs_tag.num_posts, 1)
+
+    def test_tag_filter_sidebar_only_shows_namespace_tags(self):
+        tag1 = create_tag("A")
+        tag2 = create_tag("B")
+        create_post("Post A", "a", tags=[tag1], is_archive=True)
+        create_post("Post B", "b", tags=[tag2], is_archive=False)
+        response = self.client.get(reverse("archive:post_tag", args=["A"]))
+        tag_names = {tag.name for tag in response.context["tag_list"]}
+        self.assertIn("A", tag_names)
+        self.assertNotIn("B", tag_names)
+
+    def test_tag_name_uniqueness(self):
+        create_tag("math")
+        with self.assertRaises(Exception):
+            create_tag("math")
 
 
-class SidebarVisibilityTest(TestCase):
-    def test_sidebar_hidden_when_no_content(self):
-        response = self.client.get(reverse("blog:post_index"))
-        html = response.content.decode()
-
-        self.assertNotIn("Archives", html)
-        self.assertNotIn("Tags", html)
-        self.assertNotIn("Suggested Reads", html)
-
-    def test_timeline_shows_up_when_posts_exist(self):
-        Post.objects.create(
-            title="Some Post",
-            slug="some-post",
-            is_archive=False,
-            suggested=False,
+class ArchiveTagViewTests(TestCase):
+    def test_tag_view_with_multiple_posts(self):
+        math_tag = create_tag("math")
+        cs_tag = create_tag("cs")
+        post1 = create_post("Post 1", "post-1", tags=[math_tag], is_archive=True)
+        post2 = create_post(
+            "Post 2", "post-2", tags=[math_tag, cs_tag], is_archive=True
         )
-        response = self.client.get(reverse("blog:post_index"))
-        self.assertContains(response, "Archives")
+        post3 = create_post("Post 3", "post-3", tags=[cs_tag], is_archive=True)
+        response = self.client.get(reverse("archive:post_tag", args=[math_tag]))
+        self.assertEqual(response.status_code, 200)
+        tgt_post_list = response.context["post_list"]
+        self.assertIn(post1, tgt_post_list)
+        self.assertIn(post2, tgt_post_list)
+        self.assertNotIn(post3, tgt_post_list)
 
-    def test_tags_box_only_shows_if_tags_exist(self):
-        tag = PostTag.objects.create(name="math")
-        post = Post.objects.create(
-            title="Tagged Post",
-            slug="tagged-post",
-            is_archive=False,
-            suggested=False,
+    def test_tag_view_with_wrong_tag(self):
+        response = self.client.get(reverse("archive:post_tag", args=["incorrect_tag"]))
+        self.assertEqual(response.status_code, 404)
+
+
+class ArchiveDetailViewTests(TestCase):
+    def test_detail_view_check_sidebar(self):
+        cs_tag = create_tag("cs")
+        post = create_post(
+            "Post Title", "post-title", tags=[cs_tag], suggested=True, is_archive=True
         )
-        post.tags.add(tag)
-
-        response = self.client.get(reverse("blog:post_index"))
-        self.assertContains(response, "Tags")
-        self.assertContains(response, "math")
-
-    def test_suggested_box_only_shows_if_something_is_suggested(self):
-        Post.objects.create(
-            title="Suggested Post",
-            slug="suggested-post",
-            is_archive=False,
-            suggested=True,
-        )
-        response = self.client.get(reverse("blog:post_index"))
-        self.assertContains(response, "Suggested Reads")
-
-    def test_suggested_box_hidden_if_no_suggestions(self):
-        Post.objects.create(
-            title="Normal Post",
-            slug="normal-post",
-            is_archive=False,
-            suggested=False,
-        )
-        response = self.client.get(reverse("blog:post_index"))
+        response = self.client.get(reverse("archive:post_detail", args=[post.slug]))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Tag List")
         self.assertNotContains(response, "Suggested Reads")
+        self.assertNotContains(response, "Post Timeline")
 
+    def test_detail_view_tags(self):
+        math_tag = create_tag("math")
+        cs_tag = create_tag("cs")
+        post = create_post("Post Title", "post-title", tags=[cs_tag], is_archive=True)
+        post_new = create_post("New Post Title", "new-post-title", tags=[math_tag])
+        response = self.client.get(reverse("archive:post_detail", args=[post.slug]))
+        target_post = response.context["post"]
+        self.assertIn(cs_tag, target_post.tags.all())
+        self.assertNotIn(math_tag, target_post.tags.all())
 
-def test_suggested_post_appears_in_post_list(self):
-    suggested_post = Post.objects.create(
-        title="Featured",
-        slug="featured",
-        is_archive=False,
-        suggested=True,
-    )
-    response = self.client.get(reverse("blog:post_index"))
-    self.assertIn(suggested_post, response.context["post_list"])
+    def test_detail_no_other_posts(self):
+        math_tag = create_tag("math")
+        cs_tag = create_tag("cs")
+        post = create_post("Post Title", "post-title", tags=[cs_tag], is_archive=True)
+        post_new = create_post("New Post Title", "new-post-title", tags=[math_tag])
+        response = self.client.get(reverse("archive:post_detail", args=[post.slug]))
+        self.assertNotContains(response, post_new.title)
 
+    def test_detail_wrong_slug(self):
+        post = create_post("Post Title", "post-title", is_archive=True)
+        response = self.client.get(
+            reverse("archive:post_detail", args=["incorrect-slug"])
+        )
+        self.assertEqual(response.status_code, 404)
 
-def test_tag_filter_sidebar_only_shows_namespace_tags(self):
-    tag1 = PostTag.objects.create(name="A")
-    tag2 = PostTag.objects.create(name="B")
+    def test_detail_slug_edge_case(self):
+        post = create_post("INMO 2025 Review", "inmo-2025-review", is_archive=True)
+        response = self.client.get(reverse("archive:post_detail", args=[post.slug]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "INMO 2025 Review")
 
-    create_post("Post A", "a", tags=[tag1], is_archive=False)
-    create_post("Post B", "b", tags=[tag2], is_archive=True)
-
-    response = self.client.get(reverse("blog:post_tag", args=["A"]))
-    tag_names = {tag.name for tag in response.context["tags"]}
-    self.assertIn("A", tag_names)
-    self.assertNotIn("B", tag_names)
-
-
-def test_tags_not_shown_if_not_attached(self):
-    tag = PostTag.objects.create(name="floating")
-    # no post attached
-
-    response = self.client.get(reverse("blog:post_index"))
-    self.assertNotContains(response, "floating")
-    self.assertNotContains(response, "Tags")
+    def test_slug_uniqueness(self):
+        create_post("Post A", "same-slug", is_archive=True)
+        with self.assertRaises(Exception):
+            create_post("Post B", "same-slug", is_archive=True)
