@@ -2,11 +2,11 @@ main {
   grid-column: 1/4;
   grid-row: 2/3;
   width: 69%;
+  padding: 2rem;
 }
 
 article {
   width: 75%;
-  height: fit-content;
   padding: 3rem 5rem;
 }
 

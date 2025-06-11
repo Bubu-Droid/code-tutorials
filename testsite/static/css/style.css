@@ -37,7 +37,7 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: auto 1fr auto;
   gap: 2em;
   font-size: 18px;
@@ -226,6 +226,11 @@ nav li a:hover {
 #scroll-to-top-btn.show {
   opacity: 1;
   transform: translateY(0);
+}
+
+mjx-container {
+  font-size: 1rem; /* or tweak to 0.95rem if needed */
+  line-height: 1.6;
 }
 
 /* Animations */
