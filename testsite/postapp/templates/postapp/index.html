@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 
+{% block title %}{{ title }}{% endblock %}
+{% block description %}{{ description }}{% endblock %}
+
 {% load static %}
 {% block head %}
 <link rel="stylesheet" href="{% static 'postapp/index_style.css' %}">

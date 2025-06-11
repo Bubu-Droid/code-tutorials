@@ -2,6 +2,8 @@ import calendar
 
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render
+from django.utils.safestring import mark_safe
+from markdown import markdown
 
 from .models import Post, PostTag
 
@@ -34,6 +36,17 @@ def post_index(request):
     is_archive = request.resolver_match.namespace == "archive"
     posts = Post.objects.filter(is_archive=is_archive).order_by("-date")
     post_timeline, tag_list, suggested_posts = get_sidebar_data(is_archive)
+
+    if is_archive:
+        title = "Archive"
+        desc = "Here is the archive of my website which\
+        contains old materials mainly shared for storage\
+        purposes"
+    else:
+        title = "Blog"
+        desc = "Read Bubu’s latest posts on math, code,\
+        thoughts, and everything in between."
+
     return render(
         request,
         "postapp/index.html",
@@ -42,6 +55,8 @@ def post_index(request):
             "post_timeline": post_timeline,
             "tag_list": tag_list,
             "suggested_posts": suggested_posts,
+            "title": title,
+            "description": desc,
         },
     )
 
@@ -49,7 +64,22 @@ def post_index(request):
 def post_detail(request, slug):
     is_archive = request.resolver_match.namespace == "archive"
     post = get_object_or_404(Post, slug=slug, is_archive=is_archive)
-    return render(request, "postapp/detail.html", {"post": post})
+    title = "Post"
+    desc = "You are currently viewing a post."
+    md_content = post.get_markdown_content()
+    html_content = mark_safe(
+        markdown(md_content, extensions=["fenced_code", "toc", "codehilite"])
+    )
+    return render(
+        request,
+        "postapp/detail.html",
+        {
+            "post": post,
+            "title": title,
+            "description": desc,
+            "content": html_content,
+        },
+    )
 
 
 def post_tag(request, tag):
