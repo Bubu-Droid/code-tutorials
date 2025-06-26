@@ -18,9 +18,16 @@ class PostAdmin(admin.ModelAdmin):
                 "fields": [
                     "title",
                     "slug",
+                    "date",
+                ]
+            },
+        ),
+        (
+            "Category",
+            {
+                "fields": [
                     "is_archive",
                     "suggested",
-                    "date",
                 ]
             },
         ),

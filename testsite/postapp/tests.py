@@ -407,3 +407,107 @@ class ArchiveDetailViewTests(TestCase):
         create_post("Post A", "same-slug", is_archive=True)
         with self.assertRaises(Exception):
             create_post("Post B", "same-slug", is_archive=True)
+
+
+class BlogSearchViewTests(TestCase):
+    def test_show_only_relevant_posts(self):
+        post1 = create_post("Geometry", "geometry")
+        post2 = create_post("Algebra", "algebra")
+        response = self.client.get(reverse("blog:post_search") + "?q=geometry")
+        self.assertEqual(response.status_code, 200)
+        tgt_post_list = response.context["post_list"]
+        self.assertContains(response, "Search Results")
+        self.assertIn(post1, tgt_post_list)
+        self.assertNotIn(post2, tgt_post_list)
+
+    def test_check_default_view_when_empty(self):
+        post1 = create_post("Post 1", "post-1")
+        post2 = create_post("Post 2", "post-2")
+        response = self.client.get(reverse("blog:post_search") + "?q=")
+        tgt_post_list = response.context["post_list"]
+        self.assertContains(response, "Blog Posts")
+        self.assertIn(post1, tgt_post_list)
+        self.assertIn(post2, tgt_post_list)
+
+    def test_check_order_of_posts(self):
+        post1 = create_post("Post 1", "post-1")
+        post2 = create_post("Post 2", "post-2")
+        response = self.client.get(reverse("blog:post_search") + "?q=post")
+        self.assertQuerySetEqual(response.context["post_list"], [post1, post2])
+
+    def test_search_using_title(self):
+        post = create_post("Post Neow", "post-1")
+        response = self.client.get(reverse("blog:post_search") + "?q=neow")
+        tgt_post_list = response.context["post_list"]
+        self.assertIn(post, tgt_post_list)
+
+    def test_search_using_content(self):
+        post = create_post("Post Neow", "post-1")
+        response = self.client.get(reverse("blog:post_search") + "?q=slug")
+        tgt_post_list = response.context["post_list"]
+        self.assertIn(post, tgt_post_list)
+
+    def test_search_using_tags(self):
+        mathneow = create_tag("mathneow")
+        post = create_post("Post Neow", "post-1", [mathneow])
+        response = self.client.get(reverse("blog:post_search") + "?q=mathneow")
+        tgt_post_list = response.context["post_list"]
+        self.assertIn(post, tgt_post_list)
+
+    def test_no_search_results(self):
+        post = create_post("Post Neow", "post-1")
+        response = self.client.get(reverse("blog:post_search") + "?q=mathneow")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No results found for your search query.")
+
+
+class ArchiveSearchViewTests(TestCase):
+    def test_show_only_relevant_posts(self):
+        post1 = create_post("Geometry", "geometry", is_archive=True)
+        post2 = create_post("Algebra", "algebra", is_archive=True)
+        response = self.client.get(reverse("archive:post_search") + "?q=geometry")
+        self.assertEqual(response.status_code, 200)
+        tgt_post_list = response.context["post_list"]
+        self.assertContains(response, "Search Results")
+        self.assertIn(post1, tgt_post_list)
+        self.assertNotIn(post2, tgt_post_list)
+
+    def test_check_default_view_when_empty(self):
+        post1 = create_post("Post 1", "post-1", is_archive=True)
+        post2 = create_post("Post 2", "post-2", is_archive=True)
+        response = self.client.get(reverse("archive:post_search") + "?q=")
+        tgt_post_list = response.context["post_list"]
+        self.assertContains(response, "Archive Posts")
+        self.assertIn(post1, tgt_post_list)
+        self.assertIn(post2, tgt_post_list)
+
+    def test_check_order_of_posts(self):
+        post1 = create_post("Post 1", "post-1", is_archive=True)
+        post2 = create_post("Post 2", "post-2", is_archive=True)
+        response = self.client.get(reverse("archive:post_search") + "?q=post")
+        self.assertQuerySetEqual(response.context["post_list"], [post1, post2])
+
+    def test_search_using_title(self):
+        post = create_post("Post Neow", "post-1", is_archive=True)
+        response = self.client.get(reverse("archive:post_search") + "?q=neow")
+        tgt_post_list = response.context["post_list"]
+        self.assertIn(post, tgt_post_list)
+
+    def test_search_using_content(self):
+        post = create_post("Post Neow", "post-1", is_archive=True)
+        response = self.client.get(reverse("archive:post_search") + "?q=slug")
+        tgt_post_list = response.context["post_list"]
+        self.assertIn(post, tgt_post_list)
+
+    def test_search_using_tags(self):
+        mathneow = create_tag("mathneow")
+        post = create_post("Post Neow", "post-1", [mathneow], is_archive=True)
+        response = self.client.get(reverse("archive:post_search") + "?q=mathneow")
+        tgt_post_list = response.context["post_list"]
+        self.assertIn(post, tgt_post_list)
+
+    def test_no_search_results(self):
+        post = create_post("Post Neow", "post-1", is_archive=True)
+        response = self.client.get(reverse("archive:post_search") + "?q=mathneow")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No results found for your search query.")
