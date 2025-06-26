@@ -16,6 +16,64 @@ main::after {
   height: 4rem;
 }
 
+article h1,
+article h2,
+article h3,
+article h4,
+article h5,
+article h6 {
+  margin-bottom: unset;
+}
+
+.nav-right {
+  display: flex;
+  justify-content: right;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--accent);
+  border-radius: 22px;
+  background-color: var(--bg-alt);
+  overflow: hidden;
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+}
+
+.search-input {
+  flex: 1;
+  background-color: transparent;
+  color: var(--fg);
+  border: none;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.95rem;
+  font-family: var(--font-sans);
+}
+
+.search-input::placeholder {
+  color: var(--fg);
+  opacity: 0.4;
+}
+
+.search-input:focus {
+  outline: none;
+}
+
+.search-btn {
+  background: none;
+  border: none;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-logo {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
 aside {
   grid-column: 3/4;
   grid-row: 2/3;
@@ -34,23 +92,81 @@ article {
   background-color: var(--bg-alt);
   padding: 2rem 3rem;
   display: flex;
+  width: 100%;
   max-width: 1100px;
   gap: 1.3em;
   flex-direction: column;
   border-left: 8px solid var(--accent);
   border-right: 8px solid var(--accent);
   border-radius: 8px;
-  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 60%, transparent);
   transition:
     background-color 0.3s ease,
-    transform 0.2s ease,
-    box-shadow 0.3s ease;
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+.post-content {
+  position: relative;
+  min-height: 100px;
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.3em;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.post-content::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 10rem;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--bg) 0%, transparent),
+    var(--bg-alt)
+  );
+  pointer-events: none;
 }
 
 article:hover {
   background-color: color-mix(in srgb, var(--accent) 8%, var(--bg-alt));
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--accent2) 25%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent2) 60%, transparent);
+}
+
+article:hover .post-content::before {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--dark-black) 0%, transparent),
+    color-mix(in srgb, var(--accent) 8%, var(--bg-alt))
+  );
+}
+
+.post-date {
+  margin-bottom: 3rem;
+}
+
+.read-more-link {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 1rem;
+  background-color: var(--dark-black);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border-radius: 6px;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.read-more-link:hover {
+  transform: scale(1.03);
 }
 
 main h1 {
@@ -66,6 +182,14 @@ article h2 a {
     text-decoration-color 0.25s ease;
 }
 
+article h3 {
+  font-size: 2rem;
+}
+
+article h4 {
+  font-size: 1.5rem;
+}
+
 aside h3 {
   margin-top: 1.5rem;
   color: var(--yellow);
@@ -77,6 +201,10 @@ aside ul {
   display: flex;
   flex-flow: wrap column;
   gap: 0.5rem;
+}
+
+aside ul h4 {
+  margin-bottom: 0;
 }
 
 aside li {
@@ -107,7 +235,7 @@ aside li a {
   transition:
     color 0.25s ease,
     background-color 0.25s ease,
-    transform 0.2s ease,
+    transform 0.3s ease,
     box-shadow 0.3s ease;
 }
 
@@ -130,43 +258,22 @@ article h2 a:hover {
   border-right: 4px solid var(--accent2);
   border-radius: 4px;
   background-color: var(--bg-alt);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 60%, transparent);
 }
 
-details {
-  margin-bottom: 1rem;
-  border-left: 2px solid var(--accent);
-  padding-left: 0.75rem;
-}
-
-summary {
-  cursor: pointer;
-  font-weight: 500;
-  color: var(--green);
-  margin-bottom: 0.5rem;
-}
-
-#sidebar-suggest-list {
+.sidebar-suggest-list {
   display: flex;
   flex-direction: column;
 }
 
-#sidebar-suggest-list h4::before {
+.sidebar-suggest-list h4::before {
   content: "→";
   color: var(--accent2);
   font-weight: bold;
 }
 
-#sidebar-tag-list {
+.sidebar-tag-list {
   display: flex;
   flex-flow: wrap row;
-}
-
-.post-content {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 9;
-  overflow: hidden;
 }
 
 .post-para-href {
@@ -181,23 +288,6 @@ summary {
 .aside-post-link {
   position: relative;
   text-decoration: none;
-}
-
-.aside-post-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 100%;
-  height: 2px;
-  background-color: var(--accent2);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.4s ease;
-}
-
-.aside-post-link:hover::after {
-  transform: scaleX(1);
 }
 
 pre.codehilite {
@@ -266,3 +356,10 @@ code {
 .codehilite .w {
   color: #a9b1d6;
 } /* Whitespace */
+
+mark {
+  background-color: var(--accent);
+  color: black;
+  padding: 0 0.15em;
+  border-radius: 3px;
+}

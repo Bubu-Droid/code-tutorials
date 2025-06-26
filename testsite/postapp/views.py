@@ -1,11 +1,146 @@
 import calendar
+import re
 
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render
+from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
 from markdown import markdown
 
 from .models import Post, PostTag
+
+
+def bump_headings(html: str, levels: int) -> str:
+    def replace_heading(match):
+        level = int(match.group(1))
+        attrs = match.group(2) or ""
+        content = match.group(3)
+        new_level = min(level + levels, 6)
+        return f"<h{new_level}{attrs}>{content}</h{new_level}>"
+
+    return re.sub(
+        r"<h([1-6])(\s[^>]*)?>(.*?)</h\1>",
+        replace_heading,
+        html,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+
+
+def post_index(request):
+    is_archive = request.resolver_match.namespace == "archive"
+    posts = Post.objects.filter(is_archive=is_archive).order_by("-date")
+    for post in posts:
+        md_content = post.get_markdown_content()
+        html_content = markdown(
+            md_content, extensions=["fenced_code", "toc", "codehilite"]
+        )
+        bumped_content = bump_headings(html_content, levels=2)
+        post.rendered_content = mark_safe(bumped_content)
+    post_timeline, tag_list, suggested_posts = get_sidebar_data(is_archive)
+
+    if is_archive:
+        heading = "Archive Posts"
+        title = "Archive"
+        desc = "A curated archive of academic and math-related posts, storage notes, linked materials, and more from past updates."
+    else:
+        heading = "Blog Posts"
+        title = "Blog"
+        desc = "A space for my less-serious thoughts — reflections on life, rants, ideas, and whatever else I feel like sharing."
+
+    return render(
+        request,
+        "postapp/index.html",
+        {
+            "post_list": posts,
+            "post_timeline": post_timeline,
+            "tag_list": tag_list,
+            "suggested_posts": suggested_posts,
+            "title": title,
+            "description": desc,
+            "heading": heading,
+        },
+    )
+
+
+def post_detail(request, slug):
+    is_archive = request.resolver_match.namespace == "archive"
+    post = get_object_or_404(Post, slug=slug, is_archive=is_archive)
+    md_content = post.get_markdown_content()
+    html_content = markdown(md_content, extensions=["fenced_code", "toc", "codehilite"])
+    bumped_content = bump_headings(html_content, levels=1)
+    desc = " ".join(strip_tags(bumped_content).strip().split())[:150]
+    html_content = mark_safe(bumped_content)
+    return render(
+        request,
+        "postapp/detail.html",
+        {
+            "post": post,
+            "description": desc,
+            "content": html_content,
+        },
+    )
+
+
+def post_search(request):
+    is_archive = request.resolver_match.namespace == "archive"
+    query = request.GET.get("q", "").strip().lower()
+    posts = Post.objects.filter(is_archive=is_archive).order_by("-date")
+    heading = "Search Results"
+    title = "Search Results"
+
+    if query:
+        query_words = query.split()
+
+        def matches(post):
+            title = post.title.lower()
+            tags = [tag.name.lower() for tag in post.tags.all()]
+            content = post.get_markdown_content().lower()
+            return any(
+                word in title or any(word in tag for tag in tags) or word in content
+                for word in query_words
+            )
+
+        posts = [post for post in posts if matches(post)]
+    else:
+        heading = "Archive Posts" if is_archive else "Blog Posts"
+        title = "Archive" if is_archive else "Blog"
+    for post in posts:
+        md_content = post.get_markdown_content()
+        html_content = markdown(
+            md_content, extensions=["fenced_code", "toc", "codehilite"]
+        )
+        bumped_content = bump_headings(html_content, levels=2)
+        highlighted = bumped_content
+        if query:
+            for word in query_words:
+                highlighted = re.sub(
+                    rf"(?i)\b({re.escape(word)})\b",
+                    r"<mark>\1</mark>",
+                    highlighted,
+                    flags=re.IGNORECASE,
+                )
+
+        post.rendered_content = mark_safe(highlighted)
+
+    post_timeline, tag_list, suggested_posts = get_sidebar_data(is_archive)
+    if is_archive:
+        desc = "Search results from the archive — including older academic posts, math materials, problem sets, and reference content."
+    else:
+        desc = "Browse search results from the blog — covering thoughts on math, programming, introspection, and everyday musings."
+
+    return render(
+        request,
+        "postapp/index.html",
+        {
+            "post_list": posts,
+            "post_timeline": post_timeline,
+            "tag_list": tag_list,
+            "suggested_posts": suggested_posts,
+            "title": title,
+            "description": desc,
+            "heading": heading,
+        },
+    )
 
 
 def get_sidebar_data(is_archive):
@@ -32,62 +167,27 @@ def get_sidebar_data(is_archive):
     return post_timeline, tag_list, suggested_posts
 
 
-def post_index(request):
-    is_archive = request.resolver_match.namespace == "archive"
-    posts = Post.objects.filter(is_archive=is_archive).order_by("-date")
-    post_timeline, tag_list, suggested_posts = get_sidebar_data(is_archive)
-
-    if is_archive:
-        title = "Archive"
-        desc = "Here is the archive of my website which\
-        contains old materials mainly shared for storage\
-        purposes"
-    else:
-        title = "Blog"
-        desc = "Read Bubu’s latest posts on math, code,\
-        thoughts, and everything in between."
-
-    return render(
-        request,
-        "postapp/index.html",
-        {
-            "post_list": posts,
-            "post_timeline": post_timeline,
-            "tag_list": tag_list,
-            "suggested_posts": suggested_posts,
-            "title": title,
-            "description": desc,
-        },
-    )
-
-
-def post_detail(request, slug):
-    is_archive = request.resolver_match.namespace == "archive"
-    post = get_object_or_404(Post, slug=slug, is_archive=is_archive)
-    title = "Post"
-    desc = "You are currently viewing a post."
-    md_content = post.get_markdown_content()
-    html_content = mark_safe(
-        markdown(md_content, extensions=["fenced_code", "toc", "codehilite"])
-    )
-    return render(
-        request,
-        "postapp/detail.html",
-        {
-            "post": post,
-            "title": title,
-            "description": desc,
-            "content": html_content,
-        },
-    )
-
-
 def post_tag(request, tag):
     is_archive = request.resolver_match.namespace == "archive"
     tag_obj = get_object_or_404(PostTag, name=tag)
+    if is_archive:
+        title = f"Archive Posts tagged with “{tag_obj.name}”"
+        desc = f"Browse archived content tagged with “{tag_obj.name}” — including academic notes, math materials, and past resources."
+    else:
+        title = f"Blog Posts tagged with “{tag_obj.name}”"
+        desc = f"Explore blog posts tagged with “{tag_obj.name}” — covering ideas, math discussions, programming thoughts, and more."
+
     post_list = Post.objects.filter(tags=tag_obj, is_archive=is_archive).order_by(
         "-date"
     )
+    for post in post_list:
+        md_content = post.get_markdown_content()
+        html_content = markdown(
+            md_content, extensions=["fenced_code", "toc", "codehilite"]
+        )
+        bumped_content = bump_headings(html_content, levels=2)
+        post.rendered_content = mark_safe(bumped_content)
+
     post_timeline, tag_list, suggested_posts = get_sidebar_data(is_archive)
     return render(
         request,
@@ -98,5 +198,7 @@ def post_tag(request, tag):
             "post_timeline": post_timeline,
             "tag_list": tag_list,
             "suggested_posts": suggested_posts,
+            "title": title,
+            "description": desc,
         },
     )

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ post.title }}{% endblock %}
 {% block description %}{{ description }}{% endblock %}
 
-{% load static %}
 {% block head %}
 <link rel="stylesheet" href="{% static 'postapp/index_style.css' %}">
 <link rel="stylesheet" href="{% static 'postapp/detail_style.css' %}">
@@ -13,8 +13,7 @@
 <main>
   <article>
     <h1>{{ post.title }}</h1>
-
-    <p><strong>Date:</strong> {{ post.date }}</p>
+    <p class="post-date"><strong>Date:</strong> {{ post.date }}</p>
     {{ content }}
     {% if post.tags.exists %}
     <ul class="tag-list">
