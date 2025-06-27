@@ -224,6 +224,25 @@ mjx-container {
   line-height: 1.6;
 }
 
+.anchored {
+  display: flex;
+  align-items: center;
+}
+
+.heading-anchor {
+  text-decoration: none;
+  color: var(--accent);
+  font-size: 0.7em;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+  position: absolute;
+  transform: translateX(-125%);
+}
+
+.heading-anchor:hover {
+  opacity: 1;
+}
+
 /* Animations, Transitions and Global Styling */
 
 .link-underline-slide::after {

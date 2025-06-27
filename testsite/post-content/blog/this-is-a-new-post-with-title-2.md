@@ -1,4 +1,4 @@
-# Primary heading
+# Primary heading {.anchored}
 
 This is some text before heading
 This is another line with `inline` stuff in it.
