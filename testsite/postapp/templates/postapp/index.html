@@ -6,10 +6,11 @@
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'postapp/index_style.css' %}">
+<link rel="stylesheet" href="{% static 'postapp/index_responsive.css' %}">
 {% endblock %}
 
 {% block nav-right %}
-<div class="nav-right">
+<div class="nav-right" id="nav-search">
   <form action="{% url request.resolver_match.namespace|add:':post_search' %}" method="get" class="search-form">
     <input type="text" name="q" placeholder="Search..." value="{{ request.GET.q|default_if_none:'' }}"
       class="search-input">
@@ -21,6 +22,7 @@
 {% endblock %}
 
 {% block content %}
+<div id="body-shadow"></div>
 <main class="page-content">
   {% if tag_filter %}
   <h1>
@@ -66,7 +68,43 @@
 </main>
 <button id="scroll-to-top-btn" title="Go to top">↑</button>
 
-<aside>
+<aside id="sidebar">
+  <h3 id="aside-nav-heading">Navigation Links</h3>
+  <ul class="nav-mid" id="aside-nav">
+    <li>
+      <a href="{% url 'main:home_page' %}" class="link-underline-slide nav-page-link">Home</a>
+    </li>
+    <li>
+      <a href="{% url 'blog:post_index' %}" class="link-underline-slide nav-page-link">Blog</a>
+    </li>
+    <li>
+      <a href="{% url 'main:calculus_page' %}" class="link-underline-slide nav-page-link">Calculus</a>
+    </li>
+    <li>
+      <a href="{% url 'main:olympiads_page' %}" class="link-underline-slide nav-page-link">Olympiads</a>
+    </li>
+    <li>
+      <a href="{% url 'main:pet_peeves_page' %}" class="link-underline-slide nav-page-link">Pet Peeves</a>
+    </li>
+    <li>
+      <a href="{% url 'archive:post_index' %}" class="link-underline-slide nav-page-link">Archive</a>
+    </li>
+    <li>
+      <a href="{% url 'main:contact_page' %}" class="link-underline-slide nav-page-link">Contact</a>
+    </li>
+  </ul>
+
+  <h3 id="aside-search-heading">Search {{ heading }}</h3>
+  <div class="nav-right" id="aside-search">
+    <form action="{% url request.resolver_match.namespace|add:':post_search' %}" method="get" class="search-form">
+      <input type="text" name="q" placeholder="Search..." value="{{ request.GET.q|default_if_none:'' }}"
+        class="search-input">
+      <button type="submit" class="search-btn" aria-label="Search">
+        <img src="{% static 'img/search.png' %}" alt="Search" class="search-logo" height="19.2" width="19.2">
+      </button>
+    </form>
+  </div>
+
   {% if suggested_posts %}
   <h3>Suggested Reads</h3>
   <ul class="sidebar-suggest-list sidebar-box light-box-shadow">

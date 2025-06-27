@@ -28,7 +28,10 @@
               height="16"
               width="16">cd ~/bubu<span class="cursor"></span></a>
       </div>
-      <ul class="nav-ul">
+      <button id="hamburger">
+        <img src="{% static 'img/hamburger.svg' %}" alt="Menu">
+      </button>
+      <ul class="nav-mid" id="header-nav">
         <li>
           <a href="{% url 'main:home_page' %}" class="link-underline-slide nav-page-link">Home</a>
         </li>
@@ -92,5 +95,6 @@
   </script>
   <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
   <script src="{% static 'js/anchors.js' %}"></script>
+  <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>
