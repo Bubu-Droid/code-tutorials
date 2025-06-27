@@ -14,7 +14,6 @@
   --bg: #1a1b26;
   --bg-alt: #16161e;
   --dark-black: #000;
-  --shadow-black-30: #0000004d;
   --fg: #c0caf5;
   --accent: #7aa2f7;
   --accent2: #bb9af7;
@@ -23,6 +22,8 @@
   --green: #9ece6a;
   --yellow: #e0af68;
   --font-sans: "Inter", system-ui, sans-serif;
+  --white: #b4f9f8;
+  --storm: #414868;
 
   transition: all 0.3s ease;
 }
@@ -52,14 +53,19 @@ footer {
   padding: 1rem 2rem;
   border-color: var(--accent);
   grid-column: 1/4;
+  grid-row: 1/2;
   height: fit-content;
   width: 100%;
+  background-color: var(--bg);
 }
 
 header {
   border-bottom: 1px solid var(--accent);
   grid-row: 1/2;
   grid-column: 1/4;
+  min-height: 77px;
+  display: flex;
+  justify-content: center;
 }
 
 footer {
@@ -101,6 +107,7 @@ p {
 
 nav {
   display: grid;
+  width: 100%;
   grid-template-columns: repeat(5, 1fr);
   align-items: center;
 }
@@ -118,12 +125,13 @@ summary {
   margin-bottom: 0.5rem;
 }
 
-.nav-ul {
+.nav-mid {
   display: flex;
   gap: 1.5rem;
   list-style: none;
   flex-wrap: wrap;
   justify-content: center;
+  grid-row: 1/2;
   grid-column: 2/5;
 }
 
@@ -167,6 +175,8 @@ a:hover {
   font-weight: 600;
   color: var(--accent);
   text-decoration: none;
+  grid-row: 1/2;
+  grid-column: 1/2;
 }
 
 .cursor {
@@ -193,7 +203,7 @@ a:hover {
   position: fixed;
   bottom: 2rem;
   left: 2rem;
-  z-index: 100;
+  z-index: 10000;
   background-color: var(--accent);
   color: var(--bg);
   border: none;
@@ -267,7 +277,7 @@ mjx-container {
 }
 
 .dark-box-shadow {
-  box-shadow: 0 2px 6px var(--shadow-black-30);
+  box-shadow: 0 0 8px var(--dark-black);
 }
 
 @keyframes blink {
