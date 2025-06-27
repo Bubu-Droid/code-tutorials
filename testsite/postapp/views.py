@@ -32,7 +32,7 @@ def post_index(request):
     for post in posts:
         md_content = post.get_markdown_content()
         html_content = markdown(
-            md_content, extensions=["fenced_code", "toc", "codehilite"]
+            md_content, extensions=["fenced_code", "toc", "codehilite", "attr_list"]
         )
         bumped_content = bump_headings(html_content, levels=2)
         post.rendered_content = mark_safe(bumped_content)
@@ -66,7 +66,9 @@ def post_detail(request, slug):
     is_archive = request.resolver_match.namespace == "archive"
     post = get_object_or_404(Post, slug=slug, is_archive=is_archive)
     md_content = post.get_markdown_content()
-    html_content = markdown(md_content, extensions=["fenced_code", "toc", "codehilite"])
+    html_content = markdown(
+        md_content, extensions=["fenced_code", "toc", "codehilite", "attr_list"]
+    )
     bumped_content = bump_headings(html_content, levels=1)
     desc = " ".join(strip_tags(bumped_content).strip().split())[:150]
     html_content = mark_safe(bumped_content)
@@ -107,7 +109,7 @@ def post_search(request):
     for post in posts:
         md_content = post.get_markdown_content()
         html_content = markdown(
-            md_content, extensions=["fenced_code", "toc", "codehilite"]
+            md_content, extensions=["fenced_code", "toc", "codehilite", "attr_list"]
         )
         bumped_content = bump_headings(html_content, levels=2)
         highlighted = bumped_content
@@ -183,7 +185,7 @@ def post_tag(request, tag):
     for post in post_list:
         md_content = post.get_markdown_content()
         html_content = markdown(
-            md_content, extensions=["fenced_code", "toc", "codehilite"]
+            md_content, extensions=["fenced_code", "toc", "codehilite", "attr_list"]
         )
         bumped_content = bump_headings(html_content, levels=2)
         post.rendered_content = mark_safe(bumped_content)
