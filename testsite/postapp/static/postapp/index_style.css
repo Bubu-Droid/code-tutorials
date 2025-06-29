@@ -16,6 +16,20 @@ main::after {
   height: 4rem;
 }
 
+.post-heading {
+  text-align: center;
+}
+
+.article-header {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: keep-all;
+}
+
 article h1,
 article h2,
 article h3,
@@ -25,11 +39,11 @@ article h6 {
   margin-bottom: unset;
 }
 
-#hamburger {
+#aside-nav {
   display: none;
 }
 
-#aside-nav {
+#aside-nav-heading {
   display: none;
 }
 
@@ -38,10 +52,6 @@ article h6 {
 }
 
 #aside-search-heading {
-  display: none;
-}
-
-#aside-nav-heading {
   display: none;
 }
 
@@ -98,7 +108,7 @@ article h6 {
   height: 1.2rem;
 }
 
-aside {
+#sidebar {
   grid-column: 3/4;
   grid-row: 2/3;
   height: fit-content;
@@ -200,6 +210,7 @@ article:hover .post-content::before {
 
 main h1 {
   font-size: 2.7em;
+  text-align: center;
 }
 
 article h2 a {
@@ -295,6 +306,12 @@ article h2 a:hover {
   flex-direction: column;
 }
 
+details h4::before {
+  content: "→";
+  color: var(--accent2);
+  font-weight: bold;
+}
+
 .sidebar-suggest-list h4::before {
   content: "→";
   color: var(--accent2);
@@ -318,78 +335,4 @@ article h2 a:hover {
 .aside-post-link {
   position: relative;
   text-decoration: none;
-}
-
-pre.codehilite {
-  background: #1f2335;
-  color: #c0caf5;
-  padding: 1rem;
-  border-radius: 6px;
-  overflow-x: auto;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-/* Inline code */
-code {
-  background-color: #2a2f4a;
-  color: #c0caf5;
-  padding: 0.15em 0.4em;
-  border-radius: 4px;
-  font-family: "JetBrains Mono", monospace;
-}
-
-/* Syntax token colors */
-.codehilite .c {
-  color: #565f89;
-  font-style: italic;
-} /* Comment */
-.codehilite .err {
-  color: #f7768e;
-  background: #3b3b3b;
-} /* Error */
-.codehilite .k {
-  color: #bb9af7;
-} /* Keyword */
-.codehilite .o {
-  color: #89ddff;
-} /* Operator */
-.codehilite .cm {
-  color: #565f89;
-  font-style: italic;
-} /* Multiline Comment */
-.codehilite .cp {
-  color: #9d7cd8;
-} /* Preprocessor */
-.codehilite .nb {
-  color: #7dcfff;
-} /* Builtin */
-.codehilite .nf {
-  color: #7aa2f7;
-} /* Function */
-.codehilite .s {
-  color: #9ece6a;
-} /* String */
-.codehilite .mi {
-  color: #ff9e64;
-} /* Number */
-.codehilite .na {
-  color: #e0af68;
-} /* Attribute */
-.codehilite .nt {
-  color: #2ac3de;
-} /* HTML tags */
-.codehilite .nv {
-  color: #c0caf5;
-} /* Variables */
-.codehilite .w {
-  color: #a9b1d6;
-} /* Whitespace */
-
-mark {
-  background-color: var(--accent);
-  color: black;
-  padding: 0 0.15em;
-  border-radius: 3px;
 }

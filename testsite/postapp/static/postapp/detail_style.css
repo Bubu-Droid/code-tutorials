@@ -5,20 +5,16 @@ main {
   padding: 2rem;
 }
 
+main h1 {
+  text-align: left;
+}
+
 article {
   min-width: 930px;
   width: 75%;
   padding: 3rem 5rem;
   gap: 1em;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  margin-bottom: unset;
+  margin-top: 2rem;
 }
 
 article h2 {

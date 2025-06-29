@@ -1,12 +1,4 @@
-@media (width <= 1400px) {
-  #nav-search {
-    display: none;
-  }
-
-  #hamburger-nav-heading {
-    display: none;
-  }
-
+@media (width <= 1200px) {
   .nav-left {
     display: none;
   }
@@ -15,63 +7,26 @@
     grid-column: 1/6;
   }
 
-  #sidebar {
-    display: none;
-  }
-
-  main {
-    grid-column: 1/4;
-    padding: 2rem 7rem;
-  }
-
-  #hamburger {
-    display: inline;
-  }
-
-  #aside-search-heading {
-    display: block;
-  }
-
-  #aside-search {
-    display: block;
-  }
-
-  #aside-search form {
-    width: 100%;
-  }
-
-  #hamburger-sidebar {
-    visibility: visible;
-    pointer-events: auto;
-  }
-
-  #hamburger-sidebar.active {
-    transform: translateX(0%);
-  }
-}
-
-@media (width <= 1050px) {
   main {
     width: 100%;
   }
 
   article {
-    width: 100%;
+    width: 80%;
     min-width: unset;
   }
 }
 
-@media (width <= 850px) {
-  main {
-    padding: 1rem 4rem;
+@media (width <= 1050px) {
+  article {
+    width: 85%;
+    padding: 3rem 4rem;
   }
+}
 
+@media (width <= 850px) {
   #header-nav {
     display: none;
-  }
-
-  #aside-nav {
-    display: flex;
   }
 
   #hamburger-nav-heading {
@@ -79,9 +34,14 @@
   }
 
   #hamburger {
+    display: inline;
     grid-column: 4/6;
     margin-left: auto;
     margin-right: 0;
+  }
+
+  #aside-nav {
+    display: flex;
   }
 
   #hamburger-sidebar {
@@ -93,7 +53,13 @@
     border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
     border-right: 0;
-    padding-top: 0;
+    visibility: visible;
+    pointer-events: auto;
+    padding-top: 1rem;
+  }
+
+  #hamburger-sidebar.active {
+    transform: translateX(0%);
   }
 
   #aside-nav-heading {
@@ -106,9 +72,20 @@
   }
 }
 
-@media (width <= 600px) {
-  .nav-left {
-    display: none;
+@media (width <= 750px) {
+  article {
+    width: 90%;
+    margin: 1rem;
+  }
+}
+
+@media (width <= 650px) {
+  article {
+    padding: 2rem 2.5rem;
+  }
+
+  article h1 {
+    font-size: 2.5rem;
   }
 
   article h2 {
@@ -116,20 +93,17 @@
   }
 
   article h3 {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 
   article h4 {
     font-size: 1rem;
   }
+}
 
-  #sidebar.active {
-    width: 100vw;
-    min-width: unset;
-  }
-
-  article {
-    padding: 2rem;
+@media (width <= 600px) {
+  .nav-left {
+    display: none;
   }
 }
 
@@ -138,12 +112,19 @@
     display: none;
   }
 
-  #hamburger-sidebar {
-    width: 100vw;
+  article {
+    padding: 2rem;
+  }
+}
+
+@media (width <= 400px) {
+  article {
+    padding: 2rem;
+    margin: 0;
+    width: 100%;
   }
 
-  main {
-    padding: 0 1rem;
-    width: 90%;
+  #hamburger-sidebar {
+    width: 100vw;
   }
 }

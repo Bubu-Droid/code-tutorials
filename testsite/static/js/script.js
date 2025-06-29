@@ -1,5 +1,5 @@
 const hamburger = document.getElementById("hamburger");
-const sidebar = document.getElementById("sidebar");
+const sidebar = document.getElementById("hamburger-sidebar");
 const shadow = document.getElementById("body-shadow");
 
 hamburger.addEventListener("click", () => {

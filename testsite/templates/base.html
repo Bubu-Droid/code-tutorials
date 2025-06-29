@@ -11,6 +11,9 @@
   <title>{% block title %}Home{% endblock %} | Bubu</title>
   <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block responsive-css %}
+  <link rel="stylesheet" href="{% static 'css/base_responsive.css' %}">
+  {% endblock %}
   {% block head %}{% endblock %}
 </head>
 
@@ -57,7 +60,38 @@
       {% block nav-right %}{% endblock %}
     </nav>
   </header>
-  {% block content %}{% endblock %}
+
+  <div id="body-shadow"></div>
+  {% block main-content %}{% endblock %}
+
+  <aside id="hamburger-sidebar">
+    <h3 id="hamburger-nav-heading">Navigation Links</h3>
+    <ul id="aside-nav">
+      <li>
+        <a href="{% url 'main:home_page' %}" class="link-underline-slide nav-page-link">Home</a>
+      </li>
+      <li>
+        <a href="{% url 'blog:post_index' %}" class="link-underline-slide nav-page-link">Blog</a>
+      </li>
+      <li>
+        <a href="{% url 'main:calculus_page' %}" class="link-underline-slide nav-page-link">Calculus</a>
+      </li>
+      <li>
+        <a href="{% url 'main:olympiads_page' %}" class="link-underline-slide nav-page-link">Olympiads</a>
+      </li>
+      <li>
+        <a href="{% url 'main:pet_peeves_page' %}" class="link-underline-slide nav-page-link">Pet Peeves</a>
+      </li>
+      <li>
+        <a href="{% url 'archive:post_index' %}" class="link-underline-slide nav-page-link">Archive</a>
+      </li>
+      <li>
+        <a href="{% url 'main:contact_page' %}" class="link-underline-slide nav-page-link">Contact</a>
+      </li>
+    </ul>
+    {% block aside-content %}{% endblock %}
+  </aside>
+
   <footer>
     <p>
       ©{% now "Y" %} Avigyan Chakraborty. Built with Django and Tokyo Night color scheme elegance.

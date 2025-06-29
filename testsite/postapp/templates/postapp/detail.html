@@ -7,9 +7,13 @@
 {% block head %}
 <link rel="stylesheet" href="{% static 'postapp/index_style.css' %}">
 <link rel="stylesheet" href="{% static 'postapp/detail_style.css' %}">
+<link rel="stylesheet" href="{% static 'postapp/detail_responsive.css' %}">
 {% endblock %}
 
-{% block content %}
+{% block responsive-css %}
+{% endblock %}
+
+{% block main-content %}
 <main>
   <article>
     <h1>{{ post.title }}</h1>
@@ -29,4 +33,5 @@
   </article>
 </main>
 <button id="scroll-to-top-btn" title="Go to top">↑</button>
+
 {% endblock %}
