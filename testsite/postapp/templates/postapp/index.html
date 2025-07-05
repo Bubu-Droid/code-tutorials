@@ -29,7 +29,7 @@
   <ul class="sidebar-suggest-list sidebar-box light-box-shadow">
     {% for p in suggested_posts %}
     <li>
-      <h4>
+      <h4 class="left-right-arrow">
         <a href="{% url request.resolver_match.namespace|add:':post_detail' p.slug %}"
           class="aside-post-link link-underline-slide">{{ p.title }}</a>
       </h4>
@@ -60,7 +60,7 @@
           <ul>
             {% for p in posts %}
             <li>
-              <h4>
+              <h4 class="left-right-arrow">
                 <a href="{% url request.resolver_match.namespace|add:':post_detail' p.slug %}"
                   class="aside-post-link link-underline-slide">{{ p.title }}</a>
               </h4>
@@ -143,7 +143,6 @@
   {% endif %}
   {% endif %}
 </main>
-<button id="scroll-to-top-btn" title="Go to top">↑</button>
 
 <aside id="sidebar">
   {% if suggested_posts %}
@@ -151,7 +150,7 @@
   <ul class="sidebar-suggest-list sidebar-box light-box-shadow">
     {% for p in suggested_posts %}
     <li>
-      <h4>
+      <h4 class="left-right-arrow">
         <a href="{% url request.resolver_match.namespace|add:':post_detail' p.slug %}"
           class="aside-post-link link-underline-slide">{{ p.title }}</a>
       </h4>

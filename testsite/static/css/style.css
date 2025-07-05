@@ -24,6 +24,8 @@
   --font-sans: "Inter", system-ui, sans-serif;
   --white: #b4f9f8;
   --storm: #414868;
+  --ul-padding-left: 0.5rem;
+  --p-lower-gap: 1rem;
 
   transition: all 0.3s ease;
 }
@@ -95,6 +97,12 @@ main {
   animation: fade-in-up 0.4s ease forwards;
 }
 
+main::after {
+  content: "";
+  display: block;
+  margin-top: 4rem;
+}
+
 h1,
 h2,
 h3,
@@ -114,7 +122,23 @@ a {
 }
 
 p {
-  margin-bottom: 1rem;
+  margin-bottom: var(--p-lower-gap);
+}
+
+ol {
+  list-style-position: inside;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+ol li {
+  margin: 0.3rem 0;
+}
+
+li ul,
+li ol {
+  margin-left: 1.5rem;
 }
 
 nav {
@@ -135,6 +159,34 @@ summary {
   font-weight: 500;
   color: var(--green);
   margin-bottom: 0.5rem;
+}
+
+.li-right-arrow li::before {
+  content: "→";
+  color: var(--accent2);
+  font-weight: bold;
+}
+
+.li-left-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  list-style: none;
+}
+
+.li-left-bar li {
+  border-left: 4px solid var(--accent);
+  padding-left: var(--ul-padding-left);
+}
+
+.ul-left-bar {
+  list-style: none;
+  border-left: 4px solid var(--accent);
+  padding-left: var(--ul-padding-left);
+}
+
+.ul-lower-gap {
+  margin-bottom: var(--p-lower-gap);
 }
 
 .nav-mid {
@@ -358,6 +410,10 @@ mjx-container {
   height: 100vh;
 }
 
+#mesh404 {
+  display: block;
+}
+
 pre.codehilite {
   background: #1f2335;
   color: #c0caf5;
@@ -432,6 +488,74 @@ mark {
   border-radius: 3px;
 }
 
+#contact-link-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+}
+
+.contact-box {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: 1fr;
+  min-height: 100px;
+  background-color: var(--bg-alt);
+  border-radius: 20px;
+  margin: 0 10rem;
+  border-left: 4px solid var(--accent2);
+  border-right: 4px solid var(--accent2);
+  transition: transform 0.3s ease;
+  min-width: 480px;
+}
+
+.icon-section {
+  grid-column: 1/3;
+  grid-row: 1/2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.icon-section a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-section img {
+  transition: opacity 0.3s ease;
+  opacity: 0.8;
+  height: 60px;
+}
+
+.icon-section img:hover {
+  cursor: pointer;
+  opacity: 1;
+}
+
+#discord-logo {
+  height: 62.5px !important;
+}
+
+#mail-logo {
+  height: 55px;
+}
+
+#yt-logo {
+  height: 58px;
+}
+
+.text-section {
+  grid-column: 3/10;
+  grid-row: 1/2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
 /* Animations, Transitions and Global Styling */
 
 .link-underline-slide::after {
@@ -449,6 +573,10 @@ mark {
 
 .link-underline-slide:hover::after {
   transform: scaleX(1);
+}
+
+.bump-up:hover {
+  transform: scale(1.05);
 }
 
 .light-box-shadow {
