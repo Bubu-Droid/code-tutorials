@@ -10,12 +10,6 @@ main {
   align-items: center;
 }
 
-main::after {
-  content: "";
-  display: block;
-  height: 4rem;
-}
-
 .post-heading {
   text-align: center;
 }
@@ -304,18 +298,6 @@ article h2 a:hover {
 .sidebar-suggest-list {
   display: flex;
   flex-direction: column;
-}
-
-details h4::before {
-  content: "→";
-  color: var(--accent2);
-  font-weight: bold;
-}
-
-.sidebar-suggest-list h4::before {
-  content: "→";
-  color: var(--accent2);
-  font-weight: bold;
 }
 
 .sidebar-tag-list {
