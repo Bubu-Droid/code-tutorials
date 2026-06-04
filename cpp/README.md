@@ -26,7 +26,7 @@ manually run the program anymore.
 ## Basic Introduction
 
 I am going to pack into a single place what I've learn so far from the
-first forty four lectures.
+first forty three lectures.
 
 `#include <iostream>` to include input-output features.
 
