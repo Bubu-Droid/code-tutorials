@@ -7,10 +7,9 @@ private:
   int m_Age;
 
 public:
-  Entity(const std::string &name) : m_Name(name), m_Age(-1) {};
-  explicit Entity(int age)
-      : m_Name("Unknown"), m_Age(age) {
-        }; // we give the explicit keyword to disable implicit conversion
+  Entity(const std::string &name) : m_Name(name), m_Age(-1) {}
+  // we give the explicit keyword to disable implicit conversion
+  explicit Entity(int age) : m_Name("Unknown"), m_Age(age) {}
 };
 
 struct Vector2 {

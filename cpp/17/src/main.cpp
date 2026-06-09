@@ -6,7 +6,7 @@ private:
   std::string m_Name;
 
 public:
-  Entity() : m_Name("Unkown") {};
+  Entity() : m_Name("Unkown") {}
   Entity(const std::string &name) : m_Name(name) {}
 
   const std::string &GetName() const {
