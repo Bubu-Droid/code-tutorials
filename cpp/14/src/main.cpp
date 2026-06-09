@@ -67,13 +67,13 @@ Line 4)";
 
   const int *a = &x;
   // cannot change the values in *a, i.e., cannot do *a = ...
-  int const *b = &y;
+  int *const b = &y;
   // cannot change the values in b, i.e., cannot do b = &...
 
   // *a = 5;
   // b = &y;
 
-  const int *c = new int; // cannot change anything
+  const int *const c = new int; // cannot change anything
 
   std::cin.get();
 }
