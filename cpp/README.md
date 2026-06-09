@@ -532,7 +532,7 @@ public:
 };
 ```
 
-### Unique, Shared, and Weak Pointers
+### Smart Pointers
 
 A unique pointer frees the memory allocated whenever the scope ends.
 We cannot have two unique pointers pointing towards the same memory location.
