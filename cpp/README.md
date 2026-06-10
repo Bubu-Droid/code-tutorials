@@ -8,6 +8,9 @@ the sense of time. Anyways, without further ado, let's get started.
 
 ## `build.sh` and `CMakeLists.txt`
 
+<!-- TODO: check what i should be using in build.sh and nvim
+        keymaps: cmake or make, g++ or gcc? -->
+
 Since we're programming in linux, we gotta do a bit of setup before
 we can actually execute our program. We gotta create a directory
 with the name of the project, suppose `PROJECT_NAME`.
@@ -289,7 +292,7 @@ We can create arrays in two ways.
 Modern way to create an array:
 
 ```cpp
-std::array<int, 5> array;
+std::array<int, 5> array = {1, 2, 3, 4, 5};
 // prints the size of the array
 std::cout << array.size() << std::endl;
 std::cout << array[2] << std::endl;
@@ -570,3 +573,510 @@ int main() {
     }
 }
 ```
+
+## Continuation of docs
+
+A shallow copy copies the pointer or the reference to some data while the deep
+copy copies the actual data residing inside the variable. When we use modern string
+functions, it makes a deep copy by default. However, if we want to make a shallow
+copy, then we need to copy via reference.
+This is the reason we use `(const std::string &s)` while passing a string to a
+function.
+
+The arrow operator is best explained by the following example:
+
+```cpp
+Entity e;
+Entity *ptr = &e;
+
+// the following lines have the same outcome
+std::cout << ptr->x << std::endl;
+std::cout << (*ptr).x << std::endl;
+```
+
+<!-- We can figure out the offset of a variable in a `struct` as follows: -->
+<!---->
+<!-- ```cpp -->
+<!-- struct Vector3 { -->
+<!--     float x, y, z; -->
+<!-- }; -->
+<!---->
+<!-- // Cherno uses int for this cuz he has a 32-bit application -->
+<!-- long offset = (long)&((Vector3 *)nullptr)->z; -->
+<!-- std::cout << offset << std::endl; -->
+<!-- ``` -->
+
+### Vectors
+
+```cpp
+struct Vector3 {
+    int x, y, z;
+};
+
+std::vector<int> vec;
+
+// adding elements to a vector
+vec.push_back(4);
+
+std::vector<Vector3> vector;
+vector.push_back({1, 2, 3});
+vector.push_back({4, 5, 6});
+
+// iterating through a vector
+
+// the old way
+for (i = 0; i < vector.size(); i++) {
+    std::cout << vector[i].x << ", " << vector[i].y << ", " << vector[i].z << std::endl;
+}
+
+// new way (note that we use reference since we aren't editing the value v)
+// OPTIMIZE!!!
+for (Vector3 &v : vector) {
+    std::cout << v.x << ", " << v.y << ", " << v.z << std::endl;
+}
+
+// another way to print the same using auto and iterator
+// we utilize the fact that vector elements are stored in contiguous locations
+for (auto it = vector.begin(); it < vector.end(); it++) {
+    std::cout << it->x << ", " << it->y << ", " << it->z << std::endl;
+}
+
+// .begin() returns a pointer to the first object
+// (.end()-1) returns a pointer to the last object
+std::cout << vector.begin()->x << std::endl;
+std::cout << (vector.end()-1)->x << std::endl;
+
+// we can delete the second element in this way
+vector.erase(vector.begin() + 1);
+
+// resets the vector size to zero by deleting all elements
+vector.clear();
+```
+
+#### Optimizing the use of vector
+
+Every time we add a new element to a vector class, it has to allocate new memory,
+put the variables in, and then delete the pre-allocated memory. This is a waste
+of resource. Moreover, when we add a new element into a vector using `push_back`,
+it first creates the element in `main` and then pushes it into the vector.
+This is a resource consuming task too. We can optimize vectors as such:
+
+```cpp
+std::vector<Vertex> vertices;
+// this reserves enough storage space for three Vertex objects
+vertices.reserve(3);
+
+// using emplace_back puts the objects inside the vector from the very beginning
+// I googled about when I should be using emplace_back instead of push_back,
+// and I see people write that one should use push_back unless they know
+// absolutely well about what they are doing.
+vertices.emplace_back(1, 2, 3);
+vertices.emplace_back(4, 5, 6);
+vertices.emplace_back(7, 8, 9);
+```
+
+### More on the `static` keyword
+
+```cpp
+void Function() {
+    // Suppose we make 5 Function() calls, then due to the static keyword,
+    // the int i = 0; statement is not called multiple times.
+    // So, we get 1 2 3 4 5 as the output. However, if we were
+    // to just use int i = 0; without the static keyword,
+    // then we would've had 1 1 1 1 1 as the output. Putting the
+    // declaration int i = 0 outside the function definition would've the same
+    // effect except that the variable i becomes public in that case which is not
+    // good. The variable instance gets preserved throughout the program time.
+    static int i = 0;
+    i++;
+    std::cout << i << std::endl;
+}
+
+class Singleton {
+public:
+    // the static keyword makes sure that the instance does not get deleted beyond
+    // the scope of the curly braces below.
+    static Singleton &Get() {
+    static Singleton instance;
+        return instance;
+    }
+
+    void Hello() {}
+};
+
+int main() {
+    Singleton::Get().Hello();
+}
+```
+
+### Returning Different Data Types from a Single Function
+
+One way to (not really) return different types of parameters is by using references.
+This is one of the best ways to do so since this is very memory efficient.
+
+```cpp
+void func1(int in1, int &out1, float &out2) {
+    out1 = in1;
+    out2 = (float)in1;
+}
+
+int a = 6;
+float b = 6.0f;
+int c = 0;
+func1(c, a, b);
+```
+
+Another way to return different types of parameters is by using pointers.
+This is also great since you can check for null pointers here.
+
+```cpp
+void func2(int in1, int *out1, float *out2) {
+    if (out1) {
+        *out1 = in1;
+    }
+    if (out2) {
+        *out2 = (float)in1;
+    }
+}
+
+int *e;
+e = nullptr;
+float *f = &b;
+*f = 6.0f;
+int g = 0;
+
+// In this case, e only gets returned if it is not a null pointer. Hence, this
+// idea may be used to exclude some returns like shaders when we want to
+// disable them in-game.
+func2(g, e, f);
+```
+
+We may also use vectors/arrays to do the same task, but they end up
+allocating extra memory which just goes to waste.
+
+C++ also provides us one way of doing this, which is by making tuples.
+
+```cpp
+std::tuple<std::string, int, int> func3() {
+    return std::make_tuple("hi", 1, 2);
+}
+
+// std::tuple<std::string, int, int> res1 = func3();
+auto res1 = func3(); // the auto keyword auto-fills the type
+
+// we can also use using to do the same thing
+using Func1Type = std::tuple<std::string, int, int>;
+Func1Type res1 = func3();
+
+std::cout << std::get<0>(res1) << ", "
+    << std::get<1>(res1) << ", "
+    << std::get<2>(res1) << std::endl;
+```
+
+If there are only two return arguments, then we can use `make_pair`.
+
+```cpp
+std::pair<std::string, int> func4() {
+    return std::make_pair("avigyan chakraborty", 2);
+}
+
+std::pair<std::string, int> res2 = func4();
+
+// this is the benefit of using pairs
+std::cout << res2.first << ", " << res2.second << std::endl;
+```
+
+We may also use a `struct` to do the same thing which would then be much
+clearer. So, we can choose any one between this `struct` or the reference
+method to return data of different types from a function.
+
+```cpp
+struct profile {
+    std::string name;
+    int age;
+};
+
+profile biodata() { return {"Bubu", 19}; }
+
+// This is the struct way to do this. Man this looks so much cleaner.
+profile bubuprof = biodata();
+std::cout << bubuprof.name << ", " << bubuprof.age << std::endl;
+```
+
+> [!TIP]
+> Using the `struct` method or making references are the only decent ways
+> to do this.
+
+### Templates
+
+Templates are also explained best by using examples:
+
+```cpp
+template <typename T> void Print(T value) { std::cout << value << std::endl; }
+
+template <typename T, int N> class Array {
+private:
+    std::array<T, N> arr;
+
+public:
+    int GetSize() { return arr.size(); }
+};
+
+Array<std::string, 5> arr;
+// std::cout << arr.GetSize() << std::endl;
+
+// Let's print an array
+template <int length> void PrintArray(const std::array<int, length> &array) {
+    int i;
+    for (i = 0; i < array.size(); i++) {
+        std::cout << array[i] << std::endl;
+    }
+}
+
+std::array<int, 9> array = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+PrintArray<array.size()>(array);
+```
+
+### Compiler Directives: `#define`, `#if`, `#elif`, `#endif`
+
+```cpp
+#define WAIT std::cin.get()
+#define DEBUG 1
+// #define RELEASE 1
+
+#if DEBUG == 1
+// macro with parameter
+#define Log(x) std::cout << x << std::endl
+#elif defined(RELEASE)
+#define Log(x) std::cout << "In RELEASE mode" << std::endl
+#else
+// removes the text all together
+#define Log(x)
+#endif
+
+#if 0
+    std::cout << "I wanna make this line removable using macros!" << std::endl;
+#endif
+```
+
+### Namespaces
+
+> [!WARNING]
+> Never use `using namespace std`. Never use namespaces in headers.
+
+```cpp
+namespace apple {
+namespace functions {
+void Print() { std::cout << "Apple" << std::endl; }
+} // namespace functions
+} // namespace apple
+
+namespace orange {
+void Print() { std::cout << "Orange" << std::endl; }
+} // namespace orange
+
+int main() {
+    apple::functions::Print();
+    orange::Print();
+
+    // using namespace apple::functions;
+    // this allows us to use Print() directly as shown below
+    // Print();
+
+    // using orange::Print; // this allows us to use Print() function directly
+    // (note that the entity at the end is a function and not a namespace!!!)
+    // Print();
+
+    namespace a = apple::functions; // this is an alias
+    a::Print();
+}
+```
+
+### Other Miscellaneous Implementations
+
+```cpp
+#include <algorithm>
+
+std::reverse(temp.begin(), temp.end()); // reverses the string/arrays/vectors/etc
+
+
+std::vector<int> vec = {1, 2, 3, 4, 5};
+
+// finds and returns an iterator if found
+// if not found then it returns the pointer to vec.end() which is
+// beyond the range of vec! we must always manually check if problems
+// like this arise!
+// to just check if an element is there or not, use std::any_of
+auto it =
+  std::find_if(vec.begin(), vec.end(), [](int value) { return value > 3; });
+
+std::vector<int> vec = {2, 4, 3, 5, 1};
+// std::sort(vec.begin(), vec.end()); // sorts in ascending order by default
+std::sort(vec.begin(), vec.end(), [](int a, int b) {
+    if (a == 1) {
+        return false;
+    } else if (b == 1) {
+        // returning true means you put a before b and vice-versa
+        return true;
+    } else {
+        return a < b;
+    }
+});
+```
+
+```cpp
+#include <functional>
+
+void ForEach(const std::vector<int> &values,
+             const std::function<void(int)> &func) {
+    for (int value : values) {
+        func(value);
+    }
+}
+
+// function pointer
+auto function = PrintValue;
+
+std::vector<int> vec = {1, 2, 3, 4, 5};
+ForEach(vec, function);
+
+// We can achieve the same using lambda functions.
+// If you don't pass anything in the first square brackets, no variable from
+// the outer scope gets imported into the lambda function. We can pass multiple
+// arguments into lambda using [a, &b, ...],
+// = -> everything by value,
+// & -> everything by reference
+ForEach(vec, [](int value) { std::cout << value << std::endl; });
+```
+
+### Threads
+
+We need `#include <thread>` in order to use threading.
+
+```cpp
+#include <thread>
+
+static bool s_Finished = false;
+
+void DoWork() {
+    using namespace std::literals::chrono_literals;
+
+    std::cout << "Started thread with id = " << std::this_thread::get_id()
+            << std::endl;
+    while (!s_Finished) {
+        std::cout << "Working..." << std::endl;
+        std::this_thread::sleep_for(1s);
+    }
+}
+
+int main() {
+    using namespace std::chrono_literals;
+    std::cout << "Started thread with id = " << std::this_thread::get_id()
+            << std::endl;
+
+    // starts a new thread with the name "worker"
+    std::thread worker(DoWork);
+
+    std::cin.get();
+    s_Finished = true;
+
+    // holds the current thread till the work in the "worker" thread is done
+    worker.join();
+
+    std::cin.get();
+
+    std::cout << "Finished thread with id = " << std::this_thread::get_id()
+            << std::endl;
+}
+```
+
+### Chrono Statis (!)
+
+<!-- #TODO: add link here -->
+
+In order to use Chrono Statis in this mortal world, we need `#include <chrono>`.
+
+```cpp
+#include <chrono>
+
+struct Timer {
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+    std::chrono::duration<float> duration;
+    Timer() { start = std::chrono::high_resolution_clock::now(); }
+    ~Timer() {
+        end = std::chrono::high_resolution_clock::now();
+        duration = end - start;
+        float ms = duration.count() * 1000.0f;
+
+        std::cout << "Timer took " << ms << "ms" << std::endl;
+    }
+};
+
+void Function() {
+    Timer timer; // automatically gets destroyed when the scope ends and gives us
+               // our benchmark metrics
+    int i;
+    for (int i = 0; i < 100; i++) {
+        std::cout << i << std::endl; // removing endl has a huge improvement
+    }
+}
+
+int main() {
+  auto start = std::chrono::high_resolution_clock::now();
+  std::this_thread::sleep_for(1s);
+  auto end = std::chrono::high_resolution_clock::now();
+
+  std::chrono::duration<float> duration = end - start;
+  std::cout << duration.count() << "s" << std::endl;
+
+  Function();
+}
+```
+
+### Making 3d Arrays
+
+```cpp
+int main() {
+    const int arr_size_1 = 5;
+    const int arr_size_2 = 6;
+    const int arr_size_3 = 7;
+    int i, j, k;
+
+    int *arr_new = new int[arr_size_1 * arr_size_2 * arr_size_3];
+
+    for (i = 0; i < arr_size_1; i++) {
+        for (j = 0; j < arr_size_2; j++) {
+            for (k = 0; k < arr_size_3; k++) {
+                arr_new[arr_size_2 * arr_size_3 * i + arr_size_3 * j + k]
+                    = i + j + k;
+            }
+        }
+    }
+
+    delete[] arr_new;
+}
+```
+
+### Type Casting
+
+```cpp
+// C style casts
+double a = 9.5;
+int b = a; // implicit casting
+int c = (int)a; // explicit casting
+
+// C++ style cast
+int d = static_cast<int>(a);
+```
+
+### Pre-compiled Headers
+
+> [!WARNING]
+> I'm not sure about this section. The commands were suggested to me
+> by an LLM and I'm too lazy to look into how pre-compiled headers work right now.
+
+In order to use pre-compiled headers in C++, we need to compile the
+pre-compile header (.h) file that contains all the imports using the command
+`g++ -std=c++14 pch.h` and then add
+`target_precompile_headers(PROJECT_NAME PRIVATE "${source_dir}/pch.h")` to
+`CMakeLists.txt`.
