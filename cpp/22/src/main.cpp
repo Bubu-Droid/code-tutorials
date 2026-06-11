@@ -12,6 +12,7 @@ int main() {
   // we should try to always make vectors of objects and not pointers, but
   // making them of pointers makes them more optimized ig. but try not to do
   // that idk why, but Cherno said
+  std::vector<int> newarr;
   std::vector<int> intarr;
   intarr.push_back(4);
 
@@ -37,10 +38,16 @@ int main() {
     std::cout << v.x << ", " << v.y << ", " << v.z << std::endl;
   }
 
+  for (auto it = vector.begin(); it < vector.end(); it++) {
+    std::cout << it->x << ", " << it->y << ", " << it->z << std::endl;
+  }
+
   // vector.clear(); // resets the vector size to zero by deleting all elements
 
   // the .begin gives you the pointer to the first Vector3 object
+  std::cout << "Meow!\n";
   std::cout << vector.begin()->x << std::endl;
+  std::cout << (vector.end() - 1)->x << std::endl;
 
   // vector.erase(2); // can't do this
   vector.erase(vector.begin() + 1); // gotta do this to delete the second object

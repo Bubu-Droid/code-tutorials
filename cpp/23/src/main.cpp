@@ -4,9 +4,9 @@
 struct Vertex {
   float x, y, z;
   Vertex(float x, float y, float z) : x(x), y(y), z(z) {}
-  Vertex(const Vertex &v) : x(v.x), y(v.y), z(v.z) {
-    std::cout << "Copied!" << std::endl;
-  }
+  // Vertex(const Vertex &v) : x(v.x), y(v.y), z(v.z) {
+  //   std::cout << "Copied!" << std::endl;
+  // }
 };
 
 void Function() {
