@@ -8,9 +8,6 @@ the sense of time. Anyways, without further ado, let's get started.
 
 ## `build.sh` and `CMakeLists.txt`
 
-<!-- TODO: check what i should be using in build.sh and nvim
-        keymaps: cmake or make, g++ or gcc? -->
-
 Since we're programming in linux, we gotta do a bit of setup before
 we can actually execute our program. We gotta create a directory
 with the name of the project, suppose `PROJECT_NAME`.
@@ -992,9 +989,8 @@ int main() {
 
 ### Chrono Statis (!)
 
-<!-- #TODO: add link here -->
-
-In order to use Chrono Statis in this mortal world, we need `#include <chrono>`.
+In order to use [Chrono Statis][chronostasis] in this mortal world,
+we need `#include <chrono>`.
 
 ```cpp
 #include <chrono>
@@ -1080,3 +1076,5 @@ pre-compile header (.h) file that contains all the imports using the command
 `g++ -std=c++14 pch.h` and then add
 `target_precompile_headers(PROJECT_NAME PRIVATE "${source_dir}/pch.h")` to
 `CMakeLists.txt`.
+
+[chronostasis]: https://blackclover.fandom.com/wiki/Chrono_Stasis
