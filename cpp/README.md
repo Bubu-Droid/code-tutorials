@@ -601,6 +601,8 @@ std::cout << (*ptr).x << std::endl;
 <!-- // Cherno uses int for this cuz he has a 32-bit application -->
 <!-- long offset = (long)&((Vector3 *)nullptr)->z; -->
 <!-- std::cout << offset << std::endl; -->
+<!-- // we can also use this: -->
+<!--  uint64_t offset = offsetof(Entity, m_Name); -->
 <!-- ``` -->
 
 ### Vectors
@@ -804,6 +806,14 @@ std::cout << bubuprof.name << ", " << bubuprof.age << std::endl;
 > Using the `struct` method or making references are the only decent ways
 > to do this.
 
+> [!NOTE]
+> C++ versions 17 and beyond support structured bindings where you can load
+> the arguments returned from a function into variables as such:
+>
+> ```cpp
+> auto[a, b] = func(); // func returns (int a, int b)
+> ```
+
 ### Templates
 
 Templates are also explained best by using examples:
@@ -956,7 +966,6 @@ We need `#include <thread>` in order to use threading.
 static bool s_Finished = false;
 
 void DoWork() {
-    using namespace std::literals::chrono_literals;
 
     std::cout << "Started thread with id = " << std::this_thread::get_id()
             << std::endl;
@@ -967,7 +976,6 @@ void DoWork() {
 }
 
 int main() {
-    using namespace std::chrono_literals;
     std::cout << "Started thread with id = " << std::this_thread::get_id()
             << std::endl;
 
@@ -995,18 +1003,32 @@ we need `#include <chrono>`.
 ```cpp
 #include <chrono>
 
-struct Timer {
-    std::chrono::time_point<std::chrono::system_clock> start, end;
-    std::chrono::duration<float> duration;
-    Timer() { start = std::chrono::high_resolution_clock::now(); }
-    ~Timer() {
-        end = std::chrono::high_resolution_clock::now();
-        duration = end - start;
-        float ms = duration.count() * 1000.0f;
-
-        std::cout << "Timer took " << ms << "ms" << std::endl;
+class Timer {
+private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> m_StartPoint;
+public:
+    Timer() {
+        m_StartPoint = std::chrono::high_resolution_clock::now();
     }
-};
+
+    ~Timer() {
+        Stop();
+    }
+
+    void Stop() {
+        auto endTimePoint = std::chrono::high_resolution_clock::now();
+
+        auto start = std::chrono::time_point_cast<std::chrono::milliseconds>(start)
+                          .time_since_epoch()
+                          .count();
+        auto end = std::chrono::time_point_cast<std::chrono::microseconds>(end)
+                        .time_since_epoch()
+                        .count();
+
+        auto duration = end1 - start1;
+        std::cout << "Timer took " << duration << "ms" << std::endl;
+    }
+}
 
 void Function() {
     Timer timer; // automatically gets destroyed when the scope ends and gives us
@@ -1076,5 +1098,194 @@ pre-compile header (.h) file that contains all the imports using the command
 `g++ -std=c++14 pch.h` and then add
 `target_precompile_headers(PROJECT_NAME PRIVATE "${source_dir}/pch.h")` to
 `CMakeLists.txt`.
+
+<!-- TODO: add links to important videos -->
+
+## Features introduced in C++ 17
+
+### `std::optional`
+
+```cpp
+#include <optional>
+
+std::optional<std::string> ReadFileAsString(const std::string &filepath) {
+    std::ifstream stream(filepath);
+    // if file is successfully opened, then this if block is run
+    if (stream) {
+        std::string result;
+        // read the file
+        stream.close();
+        return result;
+    }
+
+    // otherwise return an empty std::optional
+    return {};
+}
+
+int main() {
+    std::optional<std::string> data = ReadFileAsString("data.txt");
+    std::string value = data.value_or("Not present!");
+    std::cout << value << std::endl;
+    if (data) {
+        std::cout << "File read successfully!" << std::endl;
+    } else {
+        std::cout << "File couldn't be accessed!" << std::endl;
+    }
+    std::cin.get();
+}
+```
+
+### `std::variant`
+
+```cpp
+#include <variant>
+
+std::variant<std::string, int> newdat;
+newdat = "bubu";
+newdat.index();
+// this tell us which index the data is being stored in
+// for this case, it returns 0 as the datatype is string
+newdat = 1;
+newdat.index();
+// for this case, it returns 1 as the datatype is int
+
+// this gets the string value from newdat, given that the type is string and
+// otherwise throws an error (probably)
+std::get<std::string>(newdat);
+
+// this returns nullptr if the data is not of the mentioned type and otherwise
+// returns the pointer to the string
+if (auto newval = std::get_if<std::string>(&newdat)) {
+    std::string &v = *newval;
+} else {
+// ...
+}
+
+enum ErrorCode { NoError = 0, NotFound = 1 };
+
+std::variant<std::string, ErrorCode> ReadFileAsStringNew() {
+    if (1) {
+        return "file read successfully!";
+    } else {
+        return NotFound;
+    }
+}
+```
+
+### String Optimizations
+
+```cpp
+#include <string_view>
+
+std::string name = "Yan Chernikov";
+std::cout << name.substr(0, 3) << std::endl;
+// string allocations are slow
+// every time you use substr, it makes a new string.
+// instead of that, we use a string_view this makes no allocations
+std::string_view first_name(name.c_str(), 3);
+std::string_view last_name(name.c_str() + 4, 9);
+```
+
+### `std::move`
+
+Think of this as stealing the data from one variable and putting that
+into another variable. The variable from which the data is being stolen is
+rendered empty after using move.
+
+```cpp
+std::string meow = "meow";
+std::string neow;
+
+std::cout << "Meow: " << meow << std::endl;
+std::cout << "Neow: " << neow << std::endl;
+
+neow = std::move(meow);
+
+std::cout << "Meow: " << meow << std::endl;
+std::cout << "Neow: " << neow << std::endl;
+```
+
+### `std::map` and `std::unordered_map`
+
+`std::map`, as it suggests, is an ordered map. The ordering is based with respect
+to the keys.
+
+```cpp
+struct CityRecord {
+  int population;
+  float area;
+};
+
+// this is an unordered_map
+std::unordered_map<std::string, CityRecord> city_map;
+
+// this is a ordered map
+// std::map<typename Key, typename Tp>
+
+city_map["kolkata"] = CityRecord{100, 10.0f};
+city_map["delhi"] = CityRecord{100, 10.0f};
+city_map["chennai"] = CityRecord{100, 10.0f};
+city_map["mumbai"] = CityRecord{100, 10.0f};
+
+CityRecord &koldata = city_map["kolkata"];
+std::cout << koldata.population << std::endl;
+
+// we use .at everywhere unless we want to modify the data
+// (we prepend the const word too)
+// if we just want to read the data and not modify it, we can do it in this way:
+const auto &cities = city_map;
+const CityRecord &newkol = cities.at("kolkata");
+
+if (cities.find("kolkata") != cities.end()) {
+    printf("Data found!\n");
+    // we delete the city
+    city_map.erase("kolkata");
+    printf("Data deleted!\n");
+}
+
+// iterating through maps
+for (auto [name, city] : city_map) {
+std::cout << name << " and " << city.population << ", " << city.area
+          << std::endl;
+}
+```
+
+## Features introduced in C++ 19
+
+### Logging functions
+
+```cpp
+std::string string = std::format("Hello {} (AKA {})", "Avigyan", "Bubu");
+
+// println can directly format strings
+std::println("Hello {} (AKA {})", "Avigyan", "Bubu");
+std::print("No new line character at the end!");
+
+std::cout << string << std::endl;
+```
+
+### Exception Handling
+
+```cpp
+// the first datatype is the datatype of the result and the second one is for
+// the type of the error (structs are mostly used for this)
+std::expected<int, std::string> divide(int a, int b) {
+    if (b == 0) {
+        return std::unexpected("cannot divide by 0");
+    }
+    return a / b;
+}
+
+// we use transform instead of and_then if we know that we know something
+// won't go wrong
+// if something goes wrong in and_then, then the flow is passed to or_else too
+auto result = divide(12, 0)
+                .and_then([](int result) { return divide(result, 2); })
+                .or_else([](const std::string &error) {
+                  std::println("Error: {}", error);
+                  return std::expected<int, std::string>{69};
+                });
+std::println("result = {}", *result);
+```
 
 [chronostasis]: https://blackclover.fandom.com/wiki/Chrono_Stasis
