@@ -21,10 +21,24 @@ struct Timer {
   Timer() { start = std::chrono::high_resolution_clock::now(); }
   ~Timer() {
     end = std::chrono::high_resolution_clock::now();
-    duration = end - start;
-    float ms = duration.count() * 1000.0f;
 
-    std::cout << "Timer took " << ms << "ms" << std::endl;
+    auto start1 = std::chrono::time_point_cast<std::chrono::milliseconds>(start)
+                      .time_since_epoch()
+                      .count();
+    auto end1 = std::chrono::time_point_cast<std::chrono::microseconds>(end)
+                    .time_since_epoch()
+                    .count();
+    // auto start2 =
+    // std::chrono::time_point_cast<std::chrono::microseconds>(start)
+    //                   .time_since_epoch()
+    //                   .count();
+    // duration = end - start;
+    auto duration = end1 - start1;
+
+    // float ms = duration.count() * 1000.0f;
+
+    // std::cout << "Timer took " << ms << "ms" << std::endl;
+    std::cout << "Timer took " << duration << "ms" << std::endl;
   }
 };
 

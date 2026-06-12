@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/home/bubu/Desktop/code-tutorials/cpp/34",
+  "command": "/usr/bin/c++    -Werror -std=c++23 -g -std=gnu++23 -o CMakeFiles/34.dir/src/main.cpp.o -c /home/bubu/Desktop/code-tutorials/cpp/34/src/main.cpp",
+  "file": "/home/bubu/Desktop/code-tutorials/cpp/34/src/main.cpp",
+  "output": "CMakeFiles/34.dir/src/main.cpp.o"
+}
+]
