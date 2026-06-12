@@ -1101,6 +1101,10 @@ pre-compile header (.h) file that contains all the imports using the command
 
 <!-- TODO: add links to important videos -->
 
+### R-values and L-values
+
+[This video][rvallval] provides the best explanation for this.
+
 ## Features introduced in C++ 17
 
 ### `std::optional`
@@ -1289,3 +1293,4 @@ std::println("result = {}", *result);
 ```
 
 [chronostasis]: https://blackclover.fandom.com/wiki/Chrono_Stasis
+[rvallval]: https://youtu.be/fbYknr-HPYE
