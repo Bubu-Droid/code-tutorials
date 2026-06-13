@@ -1,6 +1,6 @@
 # Docs of C++ Tutorial by The Cherno
 
-Holy, I got super burnt out. What better time can there be to write docs!
+Holy smokes, I got super burnt out. What better time can there be to write docs!
 I just `ls -la`ed into my `cpp` source code directory and found out that
 I had started the course just on July, 1. I just love the feeling when I'm
 so immersed in doing/learning something productive that I completely lose
@@ -96,7 +96,7 @@ do {
 
 `int **pptr = &ptr;` --- a pointer to a pointer
 
-`*ptr = &newvar;` --- changes the address of the pointer
+`ptr = &newvar;` --- changes the address of the pointer
 
 `ref = newval;` --- changes the value of the variable (`var`) it was referring to
 
@@ -369,7 +369,7 @@ const int MAX_AGE = 90;
 // cannot change the value in *a, i.e., cannot do *a = ...
 const int *a = &x;
 
-// cannot change the value in b, i.e., cannot do a = ...
+// cannot change the value in b, i.e., cannot do b = ...
 int *const b = &y;
 
 // cannot change anything
@@ -696,7 +696,7 @@ public:
     // the static keyword makes sure that the instance does not get deleted beyond
     // the scope of the curly braces below.
     static Singleton &Get() {
-    static Singleton instance;
+        static Singleton instance;
         return instance;
     }
 
@@ -1021,7 +1021,8 @@ public:
         auto start = std::chrono::time_point_cast<std::chrono::milliseconds>(start)
                           .time_since_epoch()
                           .count();
-        auto end = std::chrono::time_point_cast<std::chrono::microseconds>(end)
+        // auto end = std::chrono::time_point_cast<std::chrono::microseconds>(end)
+        auto end = std::chrono::time_point_cast<std::chrono::milliseconds>(end)
                         .time_since_epoch()
                         .count();
 
@@ -1106,6 +1107,10 @@ pre-compile header (.h) file that contains all the imports using the command
 [This video][rvallval] provides the best explanation for this.
 
 ## Features introduced in C++ 17
+
+### Structured Bindings
+
+Check [this section](#returning-different-data-types-from-a-single-function).
 
 ### `std::optional`
 
