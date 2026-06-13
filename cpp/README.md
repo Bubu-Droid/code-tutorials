@@ -1299,3 +1299,9 @@ std::println("result = {}", *result);
 
 [chronostasis]: https://blackclover.fandom.com/wiki/Chrono_Stasis
 [rvallval]: https://youtu.be/fbYknr-HPYE
+
+---
+
+- I have skipped lectures that explain benchmarking or threading at an
+  appreciable depth, since they didn't seem very relevant to me for my
+  current needs.
