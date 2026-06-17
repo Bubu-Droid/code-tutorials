@@ -661,6 +661,9 @@ it first creates the element in `main` and then pushes it into the vector.
 This is a resource consuming task too. We can optimize vectors as such:
 
 ```cpp
+// std::vector<Vertex> vertices(3); // this creates three vertices set up with
+// the default constructor
+
 std::vector<Vertex> vertices;
 // this reserves enough storage space for three Vertex objects
 vertices.reserve(3);
@@ -1018,18 +1021,20 @@ public:
     void Stop() {
         auto endTimePoint = std::chrono::high_resolution_clock::now();
 
-        auto start = std::chrono::time_point_cast<std::chrono::milliseconds>(start)
-                          .time_since_epoch()
-                          .count();
+        auto start =
+        std::chrono::time_point_cast<std::chrono::milliseconds>(m_StartPoint)
+                        .time_since_epoch()
+                        .count();
         // auto end = std::chrono::time_point_cast<std::chrono::microseconds>(end)
-        auto end = std::chrono::time_point_cast<std::chrono::milliseconds>(end)
+        auto end =
+        std::chrono::time_point_cast<std::chrono::milliseconds>(endTimePoint)
                         .time_since_epoch()
                         .count();
 
-        auto duration = end1 - start1;
+        auto duration = end - start;
         std::cout << "Timer took " << duration << "ms" << std::endl;
     }
-}
+};
 
 void Function() {
     Timer timer; // automatically gets destroyed when the scope ends and gives us
