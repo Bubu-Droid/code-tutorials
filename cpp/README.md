@@ -666,7 +666,12 @@ This is a resource consuming task too. We can optimize vectors as such:
 
 std::vector<Vertex> vertices;
 // this reserves enough storage space for three Vertex objects
+// this does not initialize the objects in the vector btw
 vertices.reserve(3);
+// if you want to initialize the objects with the default values
+// that are given in the <typename>, then you should use this in case
+// you have already initialized the vector somewhere else
+vertices.resize(3);
 
 // using emplace_back puts the objects inside the vector from the very beginning
 // I googled about when I should be using emplace_back instead of push_back,
