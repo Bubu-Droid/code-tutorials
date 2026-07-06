@@ -4,5 +4,6 @@ CMakeFiles/
 build/
 .cache/
 Makefile
+cmake/
 *.zip
 *.img
